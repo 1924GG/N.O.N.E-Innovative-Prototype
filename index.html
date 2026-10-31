@@ -121,15 +121,15 @@ input[type=range]:disabled{opacity:.4}
 .flow{fill:none;stroke:#FFF1B8;stroke-width:1.8;stroke-dasharray:4 10;stroke-linecap:round;opacity:0;pointer-events:none}
 
 /* Info panel */
-.info{position:absolute;left:12px;right:12px;bottom:12px;max-height:52%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:8px;z-index:3}
-.info[hidden]{display:none}
-.info.top{top:52px;bottom:auto}
-@media (max-width:899px){.info,.info.top{position:static;max-height:none;box-shadow:none}}
-.info header{display:flex;align-items:center;gap:10px}
-.info .ic{flex:none;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:var(--soft);border:1px solid var(--line)}
-.info h3{margin:0;font:700 16px/1.2 var(--display);letter-spacing:.02em}
-.info .x{margin-left:auto;flex:none;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:18px;cursor:pointer}
-.info p{margin:0;font-size:13px}
+#info{position:absolute;left:12px;right:12px;bottom:12px;max-height:52%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:8px;z-index:3}
+#info[hidden]{display:none}
+#info.top{top:52px;bottom:auto}
+@media (max-width:899px){#info,#info.top{position:static;max-height:none;box-shadow:none}}
+#info header{display:flex;align-items:center;gap:10px}
+#info .ic{flex:none;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:var(--soft);border:1px solid var(--line)}
+#info h3{margin:0;font:700 16px/1.2 var(--display);letter-spacing:.02em}
+#info .x{margin-left:auto;flex:none;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:18px;cursor:pointer}
+#info p{margin:0;font-size:13px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:0;font-size:13px}
 .kv dt{color:var(--muted)}
 .kv dd{margin:0;font:600 13px var(--mono);font-variant-numeric:tabular-nums}
@@ -215,6 +215,76 @@ input[type=range]:disabled{opacity:.4}
   #clk{font-size:22px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== Help system ===== */
+.help-btn{display:inline-flex;align-items:center;gap:6px}
+.qm{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 12px/1 var(--body)}
+.hq{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;margin-left:6px;border-radius:50%;border:1px solid var(--line);background:var(--soft);color:var(--muted);font:700 12px/1 var(--body);text-transform:none;letter-spacing:0;cursor:pointer;vertical-align:middle}
+.hq:hover{color:var(--accent);border-color:var(--accent)}
+.ttl{display:inline-flex;align-items:center}
+.tabs .hq{margin:auto 4px auto auto}
+.linkbtn{align-self:flex-start;border:0;background:none;padding:0;color:var(--accent);font:600 13px var(--body);text-decoration:underline;cursor:pointer}
+.hb{position:fixed;inset:0;z-index:50;background:rgba(10,14,12,.55);display:flex;align-items:center;justify-content:center;padding:24px}
+.hb[hidden]{display:none}
+.help{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;width:100%;max-width:860px;max-height:min(88vh,920px);display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+.help-h{display:flex;align-items:center;gap:10px 12px;padding:14px 16px 10px;flex-wrap:wrap}
+.help-h h2{margin:0;font:700 19px/1.2 var(--display);letter-spacing:.02em;flex:1 1 auto}
+.help-h input{flex:1 1 240px;order:3;font:14px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink)}
+.help .x{flex:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:19px;cursor:pointer}
+.help .tabs{padding:0 12px}
+.help-body{overflow:auto;padding:14px 16px 18px;flex:1;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
+.help-f{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--line)}
+.help-f label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.help-f input{width:18px;height:18px;accent-color:var(--accent)}
+@media (max-width:899px){.hb{padding:0}.help{max-width:none;max-height:none;height:100%;border-radius:0;border:0}}
+.hs{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--soft);scroll-margin-top:8px;transition:box-shadow .3s}
+.hs h3{margin:0 0 6px;font:600 16px/1.25 var(--display);letter-spacing:.02em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hs p,.hs li,.hs td,.hs th{font-size:14px;line-height:1.5}
+.hs p{margin:6px 0}
+.hs ul,.hs ol{margin:6px 0;padding-left:20px}
+.hs.flash{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)}
+.hs .tag{font:600 10px var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 7px;background:var(--surface)}
+details.hs summary{cursor:pointer;font:600 15px var(--display);list-style-position:outside}
+details.hs summary .tag{margin-left:6px}
+details.hs[open] summary{margin-bottom:6px}
+kbd{font:600 12px var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;background:var(--surface)}
+.qs{list-style:none;padding:0!important;display:flex;flex-direction:column;gap:10px;counter-reset:q}
+.qs li{display:flex;gap:10px;align-items:flex-start;counter-increment:q}
+.qs .qi{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);font-size:17px;position:relative}
+.qs .qi::after{content:counter(q);position:absolute;right:-6px;top:-6px;width:17px;height:17px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 10px/17px var(--body);text-align:center}
+.flowsvg{width:100%;height:auto;display:block;margin:6px 0}
+.legend{display:grid;grid-template-columns:64px 1fr;gap:10px 12px;align-items:center}
+@media (min-width:760px){.legend{grid-template-columns:64px 1fr 64px 1fr}}
+.legend svg{width:64px;height:42px;display:block;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.legend p{margin:0;font-size:13px}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tblw{overflow-x:auto;margin-top:4px}
+.tblw table{border-collapse:collapse;width:100%;min-width:620px}
+.tblw th,.tblw td{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid var(--line)}
+.tblw th{font:600 11px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-top:0}
+.tblw td:first-child{font-weight:600;white-space:nowrap}
+.tblw .btn{white-space:nowrap}
+.lg-spin{animation:lgspin .8s linear infinite;transform-box:fill-box;transform-origin:center}
+.lg-flow{animation:lgflow .9s linear infinite}
+.lg-drop{animation:lgdrop 1s ease-in infinite}
+.lg-pulse{animation:lgpulse 1s ease-in-out infinite}
+.lg-wave{animation:lgwave 1.2s ease-in-out infinite}
+@keyframes lgspin{to{transform:rotate(360deg)}}
+@keyframes lgflow{to{stroke-dashoffset:-14}}
+@keyframes lgdrop{0%{transform:translateY(0);opacity:1}100%{transform:translateY(12px);opacity:0}}
+@keyframes lgpulse{50%{opacity:.25}}
+@keyframes lgwave{50%{transform:translateY(-3px);opacity:.5}}
+/* Guided tour */
+.tour{position:fixed;inset:0;z-index:60}
+.tour[hidden]{display:none}
+.tour-hole{position:fixed;border-radius:12px;box-shadow:0 0 0 200vmax rgba(8,12,10,.62);outline:3px solid var(--accent);outline-offset:0;pointer-events:none;transition:top .25s,left .25s,width .25s,height .25s}
+.tour-card{position:fixed;width:min(360px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 14px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:8px}
+.tour-card h3{margin:0;font:700 17px/1.2 var(--display)}
+.tour-card p{margin:0;font-size:14px}
+.tour-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.tour-btns .btn{flex:1 1 auto}
+@media (max-width:599px){.tour-card{left:12px!important;right:12px;bottom:12px;top:auto!important;width:auto}}
+@media (prefers-reduced-motion:reduce){.help svg *,.legend svg *{animation:none!important}.tour-hole{transition:none}}
 </style>
 </head>
 <body>
@@ -240,6 +310,7 @@ input[type=range]:disabled{opacity:.4}
       <button class="btn ghost" id="p15">+15 min</button>
       <button class="btn ghost" id="p60">+1 h</button>
       <button class="btn ghost" id="theme" aria-label="Cambiar tema">Tema: auto</button>
+      <button class="btn ghost help-btn" id="helpBtn" aria-label="Ayuda" title="Ayuda (tecla ? o F1)"><span class="qm" aria-hidden="true">?</span>Ayuda</button>
     </div>
   </div>
   <div class="top-in row2">
@@ -533,6 +604,7 @@ input[type=range]:disabled{opacity:.4}
       <dl class="kv" id="infoLive"></dl>
       <p class="d" id="infoSpec"></p>
       <p class="d mono" id="infoCost"></p>
+      <button class="linkbtn" id="infoHelp" type="button">¿Cómo funciona esto?</button>
       <div class="acts" id="infoActs"></div>
     </aside>
   </section>
@@ -690,6 +762,37 @@ input[type=range]:disabled{opacity:.4}
     </section>
   </div>
 </main>
+
+<!-- Help dialog -->
+<div class="hb" id="helpBack" hidden>
+  <div class="help" id="help" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <header class="help-h">
+      <h2 id="helpT">Ayuda · CAFÉ-01</h2>
+      <button class="x" id="helpX" aria-label="Cerrar ayuda">×</button>
+      <input type="search" id="helpQ" placeholder="Buscar en la ayuda (ej. batería, riego, LVD)" aria-label="Buscar en la ayuda" autocomplete="off">
+    </header>
+    <div class="tabs" role="tablist" id="helpTabs" aria-label="Secciones de la ayuda"></div>
+    <div class="help-body" id="helpBody" role="tabpanel" tabindex="-1"></div>
+    <footer class="help-f">
+      <label><input type="checkbox" id="helpNo"> No volver a mostrar al iniciar</label>
+      <button class="btn" data-run="tour" id="tourBtnF">Iniciar recorrido guiado</button>
+    </footer>
+  </div>
+</div>
+<!-- Guided tour -->
+<div class="tour" id="tour" hidden>
+  <div class="tour-hole" id="tourHole"></div>
+  <div class="tour-card" id="tourCard" role="dialog" aria-modal="true" aria-labelledby="tourT" aria-describedby="tourP">
+    <span class="d mono" id="tourN"></span>
+    <h3 id="tourT"></h3>
+    <p id="tourP"></p>
+    <div class="tour-btns">
+      <button class="btn ghost" id="tourPrev">Anterior</button>
+      <button class="btn" id="tourNext">Siguiente</button>
+      <button class="btn ghost" id="tourExit">Salir</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -1558,6 +1661,316 @@ Object.entries(thIds).forEach(([id,k])=>$(id).onchange=e=>{
 function setHH(){document.documentElement.style.setProperty('--hh',$('top').offsetHeight+'px');}
 window.addEventListener('resize',()=>{setHH();dirty=true;});
 
+
+/* =====================================================================
+   Help system: content (edit here), dialog, search, tour, contextual help
+   ===================================================================== */
+function hbox(x,y,w,t1,t2,col){
+  return `<rect x="${x}" y="${y}" width="${w}" height="50" rx="9" fill="var(--surface)" stroke="${col}" stroke-width="2"/>`+
+    `<text x="${x+w/2}" y="${y+21}" text-anchor="middle" style="font:600 13px var(--display);fill:var(--ink)">${t1}</text>`+
+    `<text x="${x+w/2}" y="${y+38}" text-anchor="middle" style="font:500 10.5px var(--mono);fill:var(--muted)">${t2}</text>`;
+}
+const harr=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--muted)" stroke-width="2" marker-end="url(#hArrow)"/>`;
+const FLOW_SVG=`<svg class="flowsvg" viewBox="0 0 720 300" role="img" aria-label="Diagrama: sensores, Arduino, actuadores, comunicación y energía">
+<defs><marker id="hArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="var(--muted)"/></marker></defs>
+<text x="10" y="14" style="font:600 10.5px var(--body);fill:var(--muted);letter-spacing:.08em">CONTROL</text>
+${hbox(10,22,190,'Sensores','DHT22 (D2) · Suelo (A0)','var(--water)')}
+${hbox(265,22,190,'Arduino Uno','umbrales + IA · EEPROM','var(--accent)')}
+${hbox(520,22,190,'Actuadores','LED D5 · Vent. D6 · Bomba D7','var(--ok)')}
+${harr(200,47,262,47)}${harr(455,47,517,47)}
+<text x="10" y="112" style="font:600 10.5px var(--body);fill:var(--muted);letter-spacing:.08em">COMUNICACIÓN</text>
+${hbox(200,120,150,'ESP8266','Wi-Fi · app · OTA','var(--water)')}
+${hbox(370,120,150,'HC-05','Bluetooth','var(--water)')}
+${harr(300,120,330,75)}${harr(430,120,395,75)}
+<text x="10" y="210" style="font:600 10.5px var(--body);fill:var(--muted);letter-spacing:.08em">ENERGÍA</text>
+${hbox(10,218,120,'Panel 20 W','solar','var(--sun)')}
+${hbox(150,218,130,'Regulador','PWM · LVD','var(--sun)')}
+${hbox(300,218,130,'Batería 12 V','7 Ah ≈ 84 Wh','var(--sun)')}
+${hbox(450,218,120,'Cargas 12 V','LED · bomba','var(--sun)')}
+${hbox(590,218,120,'LM2596','5 V: Arduino…','var(--sun)')}
+${harr(130,243,147,243)}${harr(280,243,297,243)}${harr(430,243,447,243)}${harr(570,243,587,243)}
+</svg>`;
+const BL='M30 20 C 32 12, 39 8, 43 11 C 40 16, 36 19, 30 20Z';
+const blades=cls=>`<g class="${cls}" fill="#AEB8BE">${[0,72,144,216,288].map(a=>`<path d="${BL}" transform="rotate(${a} 30 20)"/>`).join('')}</g>`;
+const LEG=[
+  [`<svg viewBox="0 0 60 40"><rect x="12" y="2" width="36" height="36" rx="5" fill="#1F2427"/><circle cx="30" cy="20" r="15" fill="#2B3237" stroke="#4FB3E8" stroke-width="2"/>${blades('lg-spin')}<circle cx="30" cy="20" r="3.5" fill="#596268"/></svg>`,'<b>Ventilador girando</b> = encendido (ON). Quieto = apagado (OFF).'],
+  [`<svg viewBox="0 0 60 40"><rect x="10" y="4" width="40" height="6" rx="2" fill="#2A2F33"/><rect x="13" y="5.5" width="34" height="3" fill="#FFF3B0"/><polygon points="12,10 48,10 56,38 4,38" fill="#FFE27A" opacity=".55"/></svg>`,'<b>Cono amarillo bajo la barra LED</b> = intensidad de la luz (más brillante = más %).'],
+  [`<svg viewBox="0 0 60 40"><rect x="4" y="6" width="24" height="30" fill="#3D8FD1" opacity=".35" stroke="#8EA6B4"/><rect x="32" y="12" width="24" height="24" fill="#F07A2C" opacity=".35" stroke="#8EA6B4"/><path class="lg-wave" d="M34 8 q3 -3 6 0 t6 0 t6 0" stroke="#FF7A3C" stroke-width="2" fill="none"/></svg>`,'<b>Color de la caja</b>: azul = fresco, naranja = caliente. <b>Ondas naranjas</b> sobre la tapa = más de 28 °C.'],
+  [`<svg viewBox="0 0 60 40"><ellipse cx="16" cy="24" rx="13" ry="7" fill="#CDAE7E"/><path d="M8 24 l5 2 l4 -2 M17 22 l5 2" stroke="#8C6A45" fill="none"/><ellipse cx="44" cy="24" rx="13" ry="7" fill="#3A2416"/></svg>`,'<b>Suelo</b>: claro y agrietado = seco; oscuro = húmedo.'],
+  [`<svg viewBox="0 0 60 40"><path d="M15 36 V8" stroke="#5B4528" stroke-width="2"/><path d="M15 16 C 19 10, 25 10, 28 14 C 25 17, 19 17, 15 16Z M15 24 C 11 18, 5 18, 2 22 C 5 25, 11 25, 15 24Z" fill="#2F7D3B"/><path d="M45 36 V8" stroke="#5B4528" stroke-width="2"/><path d="M45 16 C 49 18, 53 24, 53 29 C 49 27, 46 22, 45 16Z M45 22 C 41 24, 37 30, 37 34 C 41 32, 44 28, 45 22Z" fill="#C9AE3C"/></svg>`,'<b>Hojas caídas y amarillas</b> = estrés hídrico (suelo seco) o térmico (mucho calor).'],
+  [`<svg viewBox="0 0 60 40"><rect x="4" y="4" width="52" height="32" fill="#D8EAF5" opacity=".5" stroke="#8EA6B4"/><g fill="#fff" stroke="#8FB3C8" stroke-width=".7"><circle cx="12" cy="12" r="2.4"/><circle cx="22" cy="26" r="2"/><circle cx="34" cy="14" r="2.6"/><circle cx="46" cy="28" r="2"/><circle cx="48" cy="10" r="1.6"/></g></svg>`,'<b>Gotas en las paredes</b> = humedad del aire mayor a 85 %.'],
+  [`<svg viewBox="0 0 60 40"><path d="M4 12 H40 V26" stroke="#A9CBE3" stroke-width="5" fill="none"/><path class="lg-flow" d="M4 12 H40 V26" stroke="#2A64A6" stroke-width="3" stroke-dasharray="5 9" fill="none"/><ellipse class="lg-drop" cx="40" cy="30" rx="2" ry="3" fill="#58A8F0"/></svg>`,'<b>Agua azul moviéndose</b> en la manguera y <b>gotas</b> en los emisores = la bomba está regando.'],
+  [`<svg viewBox="0 0 60 40"><path d="M4 20 H56" stroke="#B8372E" stroke-width="3"/><path class="lg-flow" d="M4 20 H56" stroke="#FFF1B8" stroke-width="1.8" stroke-dasharray="4 10"/></svg>`,'<b>Guiones animados en los cables</b> = energía fluyendo. La dirección indica carga o descarga de la batería.'],
+  [`<svg viewBox="0 0 60 40"><rect x="3" y="12" width="16" height="16" rx="2" fill="#2E9A5A"/><rect x="22" y="12" width="16" height="16" rx="2" fill="#D99A2B"/><rect x="41" y="12" width="16" height="16" rx="2" fill="#D64535"/></svg>`,'<b>Batería</b>: verde > 35 %, ámbar 20–35 %, rojo < 20 %.'],
+  [`<svg viewBox="0 0 60 40"><rect x="4" y="8" width="52" height="24" rx="3" fill="#0B0F12" stroke="#3A4247"/></svg>`,'<b>Pantalla apagada</b> = LVD: la batería llegó a ≈ 8 % y el regulador cortó las cargas.'],
+  [`<svg viewBox="0 0 60 40"><path d="M4 20 H56" stroke="#F04438" stroke-width="3" stroke-dasharray="10 6"/><polygon class="lg-pulse" points="30,9 32.5,16 40,16 34,20.5 36.5,28 30,23.5 23.5,28 26,20.5 20,16 27.5,16" fill="#FFD447" stroke="#F04438"/></svg>`,'<b>Cable rojo discontinuo con chispa</b> = sensor desconectado (falla).'],
+  [`<svg viewBox="0 0 60 40"><rect class="lg-pulse" x="6" y="6" width="48" height="28" rx="4" fill="none" stroke="#FF4F4F" stroke-width="4"/><rect x="9" y="9" width="42" height="22" rx="3" fill="#1C3D6E"/><g fill="#2D7BE0"><rect x="12" y="12" width="8" height="10"/><rect x="22" y="12" width="8" height="10"/><rect x="32" y="12" width="8" height="10"/><rect x="42" y="12" width="7" height="10"/></g></svg>`,'<b>Relé con borde rojo parpadeante</b> = relé pegado: la bomba funciona sin que nadie la mande.']
+];
+const run=(k,label)=>`<button class="btn sm" data-run="${k}">${label||'Probar ahora'}</button>`;
+const HELP={tabs:[
+  {id:'inicio',title:'Inicio rápido',sections:[
+    {id:'inicio-pasos',h:'Empieza en 5 pasos',kw:'inicio empezar primeros pasos recorrido atajos teclado',html:`<ol class="qs">
+      <li><span class="qi" aria-hidden="true">👀</span><div><b>Mira el modelo (izquierda) y el tablero (derecha).</b> Los dos muestran el mismo sistema en tiempo real: si algo cambia en uno, cambia en el otro.</div></li>
+      <li><span class="qi" aria-hidden="true">👆</span><div><b>Haz clic en cualquier componente del modelo</b> (ventilador, sensor, batería, bomba…) para ver sus datos en vivo, su pin del Arduino, su costo y sus acciones.</div></li>
+      <li><span class="qi" aria-hidden="true">🌦️</span><div><b>Cambia el clima o activa la ola de calor</b> en la tarjeta Reservorio (o haciendo clic en el cielo) y observa cómo reacciona el sistema.</div></li>
+      <li><span class="qi" aria-hidden="true">🎬</span><div><b>Prueba un escenario</b> con los botones de arriba: Mediodía caluroso, Tormenta, Semana seca o Noche nublada con batería baja.</div></li>
+      <li><span class="qi" aria-hidden="true">🧾</span><div><b>Revisa el Monitor serie y el Análisis IA</b> (pestañas al final del tablero) para entender qué decidió el sistema y por qué.</div></li>
+    </ol>
+    <div class="rowa" style="margin-top:10px">${run('tour','Iniciar recorrido guiado')}<span class="d">Atajos: <kbd>?</kbd> o <kbd>F1</kbd> abre la ayuda · <kbd>Esc</kbd> la cierra.</span></div>`},
+    {id:'inicio-que',h:'¿Qué es CAFÉ-01?',kw:'gemelo digital coffee guard prototipo',html:`<p>Es el <b>gemelo digital</b> del prototipo Coffee Guard: una caja de acrílico con una planta de café que se riega con agua de lluvia, se ilumina con luz LED y funciona con energía solar. Un Arduino Uno controla todo.</p><p>Aquí puedes ver cómo se comportaría el prototipo de día y de noche, con distintos climas y con fallas, sin tocar el equipo real.</p>`}
+  ]},
+  {id:'funciona',title:'Cómo funciona',sections:[
+    {id:'flujo',h:'El sistema de un vistazo',kw:'diagrama flujo sensores arduino actuadores energía comunicación',html:`${FLOW_SVG}<p><b>Los sensores miden → el Arduino decide → los actuadores actúan.</b> El panel solar carga la batería, que alimenta todo el sistema. El ESP8266 y el HC-05 conectan el prototipo con la app y el teléfono.</p>`},
+    {id:'tiempo',h:'El tiempo de la simulación',kw:'velocidad reloj pausar reanudar minutos día noche amanecer atardecer',html:`<ul><li>Cada paso de la simulación equivale a <b>1 minuto simulado</b>.</li><li>Velocidades: <b>1, 5, 15 o 60 minutos simulados por segundo</b>. A 60, un día completo pasa en 24 segundos.</li><li><b>Pausar / Reanudar</b> detiene o continúa el tiempo; <b>+15 min</b> y <b>+1 h</b> adelantan el reloj al instante.</li><li>El reloj muestra la hora, el número de día y la fase: Amanecer, Día, Atardecer o Noche.</li></ul>`},
+    {id:'luz',h:'Luz LED de cultivo',kw:'led luz fotoperiodo pwm d5 intensidad',html:`<ul><li><b>Fotoperiodo de 12 h</b>: de 06:00 a 18:00, con rampas de 60 minutos al amanecer y al atardecer.</li><li>Intensidad base <b>80 %</b> (máximo 10 W). Se controla por PWM en el pin <b>D5</b> (0–255).</li><li>Fuera de ese horario el LED queda apagado (en modo AUTO).</li></ul>`},
+    {id:'temperatura',h:'Temperatura, humedad y ventilador',kw:'temperatura humedad ventilador dht22 d2 d6 histeresis objetivo roya',html:`<ul><li>El <b>DHT22</b> (pin <b>D2</b>) mide la temperatura y la humedad del aire dentro de la caja.</li><li>Objetivo: <b>25 °C</b>. El ventilador (pin <b>D6</b>) se enciende cuando la temperatura pasa de <b>objetivo + 1,0 °C (26 °C)</b> y se apaga cuando baja de <b>objetivo + 0,5 °C (25,5 °C)</b>. Esa diferencia evita que se encienda y apague a cada rato.</li><li>También se enciende si la <b>humedad del aire supera 80 %</b>.</li><li>Si el aire de afuera está más caliente que el objetivo, ventilar ya no alcanza para enfriar.</li><li>El café arábica prefiere <b>18–24 °C</b> de día. Con humedad mayor a 85 % sube el riesgo de roya y otros hongos.</li></ul>`},
+    {id:'riego',h:'Riego',kw:'riego bomba suelo sensor a0 relé d7 pulsos goteo umbrales marcha en seco',html:`<ul><li>El <b>sensor capacitivo de suelo</b> (pin <b>A0</b>) está calibrado: 620 = seco, 280 = saturado. Una lectura mayor a 700 se considera inválida.</li><li>El riego <b>empieza cuando el suelo baja de 45 %</b> y <b>termina al llegar a 60 %</b>.</li><li>En AUTO riega por <b>ciclos de 1 minuto de pulsos + 4 minutos de pausa</b> para que el agua se infiltre.</li><li>Cada pulso: 3 s encendida / 12 s apagada = <b>25 mL</b>. En un minuto caben 4 pulsos (100 mL).</li><li>La <b>bomba de 12 V</b> se activa con el relé del pin <b>D7</b> (activo en bajo).</li><li><b>Protección contra marcha en seco:</b> si el reservorio tiene menos de 50 mL, la bomba se bloquea.</li></ul>`},
+    {id:'reservorio',h:'Reservorio y clima',kw:'reservorio agua lluvia clima nublado despejado parcial ola de calor colector',html:`<ul><li>Reservorio de <b>2000 mL</b> que se llena con el embudo colector cuando llueve (+6 mL por minuto). Si se llena, el excedente sale por el aliviadero.</li><li>El nivel se estima contando los pulsos de la bomba.</li><li>El clima cambia la generación solar: <b>despejado 100 %, parcial 55 %, nublado 18 %, lluvia 8 %</b>.</li><li>La <b>ola de calor</b> suma +6 °C al aire de afuera.</li><li>Cambia el clima en la tarjeta Reservorio o haciendo clic en el cielo del modelo.</li></ul>`},
+    {id:'energia',h:'Energía solar y batería',kw:'energía batería panel solar regulador lvd flotación lm2596 consumo balance soc',html:`<ul><li><b>Panel solar 20 W → regulador PWM → batería 12 V 7 Ah (≈ 84 Wh)</b>.</li><li>La batería alimenta el LED y la bomba (12 V) y, a través del convertidor <b>LM2596</b>, el Arduino, los sensores, el ventilador y el relé (5 V).</li><li><b>LVD (desconexión por baja tensión):</b> cuando la batería llega a ≈ <b>8 % (11,1 V)</b>, el regulador corta todas las cargas para protegerla. Reconecta al <b>15 %</b> y el Arduino se reinicia.</li><li>Con la batería llena el regulador pasa a <b>flotación</b>.</li><li>La tarjeta Energía muestra: carga (%), tensión, Wh, generación del panel, consumo, balance y el tiempo estimado hasta el LVD.</li></ul>`},
+    {id:'modos',h:'Modos AUTO y MANUAL, e IA',kw:'auto manual interruptor d8 ia inteligencia artificial pantalla preventivo',html:`<ul><li>El <b>interruptor físico</b> (pin <b>D8</b>) elige el modo.</li><li><b>AUTO:</b> el Arduino aplica los umbrales por sí solo.</li><li><b>MANUAL:</b> tú controlas el LED (deslizador), el ventilador y la bomba. Al cambiar, el LED y el ventilador conservan su estado y la bomba queda apagada.</li><li><b>Control climático IA</b> (desde la app):<ul><li>atenúa el LED cuando hace calor (hasta −30 %);</li><li>lo limita a 60 % si está nublado o llueve y la batería está bajo 60 %; a 45 % con batería bajo 35 %; a 20 % con batería bajo 20 %;</li><li>hace <b>riego preventivo entre 05:30 y 08:00</b> si el suelo está a menos de 4 puntos del umbral y hay más de 400 mL en el reservorio;</li><li>publica un <b>análisis cada hora simulada</b>.</li></ul></li><li>Sin IA solo funcionan los umbrales fijos, y el LED se apaga si la batería baja de 15 %.</li><li>La <b>pantalla integrada</b> (I²C, A4/A5) muestra temperatura, humedad, suelo, modo, batería, panel y actuadores activos.</li></ul>`},
+    {id:'comunicacion',h:'Comunicación',kw:'wifi esp8266 bluetooth hc-05 app ota softwareserial',html:`<ul><li><b>ESP8266</b> (Wi-Fi) por SoftwareSerial en D10/D11 a 9600 baud: conecta con la app y recibe actualizaciones OTA.</li><li><b>HC-05</b> (Bluetooth 2.0): control local desde un teléfono Android.</li></ul>`},
+    {id:'simulacion',h:'Importante: es una simulación',kw:'simulación real hardware aproximado educativa',html:`<p>CAFÉ-01 es una <b>simulación educativa con física simplificada</b>. No está conectada a un prototipo real: los valores son aproximados y sirven para aprender, probar ideas y explicar el proyecto.</p>`}
+  ]},
+  {id:'usar',title:'Cómo usarlo',sections:[
+    {id:'u-componente',h:'Ver el estado de un componente',kw:'clic componente panel información pin costo',html:`<ol><li>Haz clic en una pieza del modelo (o llega con <kbd>Tab</kbd> y pulsa <kbd>Enter</kbd>).</li><li>Se abre su ficha: estado, datos en vivo, pin del Arduino, especificaciones, costo en US$ y lempiras y acciones rápidas.</li><li>La tarjeta del tablero que corresponde se resalta.</li><li>Cierra la ficha con <kbd>Esc</kbd> o con la ×.</li></ol><p class="d">Consejo: pasa el mouse por una tarjeta del tablero para ver qué piezas del modelo controla.</p>`},
+    {id:'u-manual',h:'Controlar a mano',kw:'manual deslizador led ventilador bomba actuadores control',html:`<ol><li>Cambia a <b>MANUAL</b> en la tarjeta Pantalla integrada o haciendo clic en el interruptor del modelo.</li><li>Mueve el <b>deslizador</b> de intensidad del LED.</li><li>Enciende o apaga el <b>ventilador</b> y la <b>bomba</b> con sus interruptores (tarjeta Actuadores).</li><li>Vuelve a <b>AUTO</b> para que el Arduino retome el control.</li></ol><p class="d">Con la batería en LVD los actuadores no responden porque no tienen energía.</p>`},
+    {id:'u-regar',h:'Regar ahora',kw:'riego puntual pulsos 100 ml regar ahora',html:`<p>Pulsa <b>Riego puntual · 4 pulsos (100 mL)</b> en la tarjeta Actuadores, o en la ficha de la bomba, el goteo o la planta. Funciona en AUTO y en MANUAL, pero no si el reservorio tiene menos de 50 mL o hay LVD.</p>`},
+    {id:'u-umbrales',h:'Cambiar los umbrales',kw:'umbrales objetivo temperatura riego humedad eeprom validación',html:`<ol><li>Abre la pestaña <b>Umbrales</b> (al final del tablero).</li><li>Ajusta: objetivo de temperatura (18–30 °C), inicio de riego (20–70 %), corte de riego (30–85 %) y humedad máxima del aire (50–95 %).</li><li>El corte de riego debe quedar <b>al menos 5 puntos</b> por encima del inicio. Si un valor no es válido, aparece un aviso en rojo y no se guarda.</li><li>Los cambios se guardan en el navegador, como en la EEPROM del Arduino.</li></ol>`},
+    {id:'u-tendencias',h:'Leer las tendencias de 24 h',kw:'tendencias gráficas líneas discontinuas historial',html:`<ul><li>Cuatro gráficas de las últimas 24 h: temperatura, humedad del suelo, batería y generación solar.</li><li>El punto al final de cada línea es el valor actual.</li><li>Las <b>líneas discontinuas</b> marcan el objetivo de temperatura (gráfica de temperatura) y los umbrales de inicio y corte de riego (gráfica de suelo).</li><li>Se llenan a medida que pasa el tiempo (un punto cada 5 minutos simulados).</li></ul>`},
+    {id:'pestanas',h:'Monitor serie, Análisis IA y Fallas',kw:'monitor serie log registro análisis ia fallas colores pestañas',html:`<ul><li><b>Monitor serie:</b> registro con hora de todo lo que hace el sistema. Colores: verde = correcto, amarillo = advertencia, rojo = crítico, azul = IA o app.</li><li><b>Análisis IA:</b> un resumen cada hora simulada o cuando pulsas <b>Ejecutar análisis ahora</b>.</li><li><b>Fallas, OTA y hardware:</b> interruptores rojos para simular fallas, la actualización por aire y el mapa de pines.</li></ul>`},
+    {id:'u-ota',h:'Actualizar el firmware por OTA',kw:'ota firmware actualizar 1.5.0 esp8266',html:`<ol><li>Abre la pestaña <b>Fallas, OTA y hardware</b> (o haz clic en el módulo ESP8266 del modelo).</li><li>Pulsa <b>Instalar 1.5.0</b> y mira la barra de progreso.</li><li>La actualización se rechaza si la batería está por debajo de 25 %, porque un corte a mitad de la escritura podría dañar el equipo.</li><li>La versión 1.5.0 reduce el ruido del sensor de suelo y registra los pulsos de riego.</li></ol>`},
+    {id:'u-vista',h:'Etiquetas y tema',kw:'etiquetas tema oscuro claro vista',html:`<ul><li><b>Mostrar etiquetas:</b> interruptor sobre el modelo para ver u ocultar los nombres de las piezas.</li><li><b>Tema:</b> botón en la barra superior (auto, claro u oscuro).</li><li>Ambas opciones se recuerdan en este navegador.</li></ul>`}
+  ]},
+  {id:'leyenda',title:'Leyenda del modelo',sections:[
+    {id:'leyenda',h:'Qué significa cada animación',kw:'leyenda animaciones colores ventilador led caja suelo hojas gotas agua cables batería pantalla falla relé',html:`<div class="legend">${LEG.map(([s,t])=>s+`<p>${t}</p>`).join('')}</div>`},
+    {id:'pildoras',h:'Colores de las píldoras de estado',kw:'píldoras colores estado alarmas',html:`<div class="pills"><span class="pill ok">Verde · OK</span><span class="pill warn">Ámbar · advertencia</span><span class="pill crit">Rojo · crítico</span><span class="pill info">Azul · información</span></div><p>Las mismas píldoras aparecen en la barra de alarmas, en las tarjetas y en la ficha de cada componente.</p>`}
+  ]},
+  {id:'escenarios',title:'Escenarios y fallas',sections:[
+    {id:'escenarios',h:'Escenarios',kw:'escenarios mediodía caluroso tormenta semana seca noche batería baja reset',html:`<div class="tblw"><table><thead><tr><th>Escenario</th><th>Qué prepara</th><th>Qué observar</th><th>Qué dirá el monitor / la IA</th><th></th></tr></thead><tbody>
+      <tr><td>Mediodía caluroso</td><td>Salta a las 12:00, cielo despejado y ola de calor (+6 °C afuera).</td><td>La temperatura sube, el ventilador gira, el LED se atenúa, la caja se pone naranja y aparecen ondas de calor.</td><td>“IA: LED limitado por atenuación térmica” y la alarma “Estrés térmico”.</td><td>${run('sc:hot')}</td></tr>
+      <tr><td>Tormenta</td><td>Salta a las 15:00 con lluvia; el reservorio queda en 900 mL o menos.</td><td>Lluvia animada, el reservorio sube, la generación solar cae y la batería empieza a bajar.</td><td>“Clima: lluvia. El colector recarga el reservorio…”; al llenarse, “Reservorio lleno…”.</td><td>${run('sc:storm')}</td></tr>
+      <tr><td>Semana seca</td><td>Salta a las 10:00 con el suelo en 31 % y solo 260 mL en el reservorio.</td><td>Hojas caídas, suelo claro, la bomba pulsa y el reservorio baja hasta que se activa la protección.</td><td>“Ciclo de riego iniciado…” y luego “Protección contra marcha en seco…”.</td><td>${run('sc:dry')}</td></tr>
+      <tr><td>Noche nublada con batería baja</td><td>Salta a las 20:00, nublado, batería en 11,5 % y velocidad mínima de 15.</td><td>La batería se pone roja, llega al LVD y se apagan la pantalla y todas las cargas.</td><td>“Regulador PWM: desconexión por baja tensión (LVD ≈ 11,1 V)”.</td><td>${run('sc:night')}</td></tr>
+      <tr><td>Reset</td><td>Vuelve al estado inicial: 12:00, batería 78 %, reservorio 1650 mL, sin fallas.</td><td>Todo vuelve a la normalidad.</td><td>Mensajes de arranque “[BOOT] …”.</td><td>${run('sc:reset','Restablecer')}</td></tr>
+    </tbody></table></div>`},
+    {id:'fallas',h:'Fallas',kw:'fallas dht22 desconectado sensor suelo cable suelto relé pegado batería degradada',html:`<div class="tblw"><table><thead><tr><th>Falla</th><th>Qué simula</th><th>Qué observar</th><th>Qué dirá la IA</th><th></th></tr></thead><tbody>
+      <tr><td>DHT22 desconectado</td><td>El sensor de aire deja de responder.</td><td>Cable rojo con chispa; temperatura y humedad en “ERR”; el ventilador se fuerza a ON por seguridad.</td><td>“DHT22 sin respuesta. Ventilador forzado a ON…”.</td><td>${run('f:dht')}</td></tr>
+      <tr><td>Cable del sensor de suelo suelto</td><td>A0 queda flotante (ADC ≈ 1000).</td><td>Cable rojo con chispa; suelo en “ERR”; el riego automático se bloquea.</td><td>“Sensor de suelo sin lectura válida… Riego automático bloqueado”.</td><td>${run('f:soil')}</td></tr>
+      <tr><td>Relé de bomba pegado</td><td>Los contactos del relé quedan soldados.</td><td>Relé con borde rojo parpadeante; la bomba funciona sin comando y el reservorio se vacía.</td><td>“Anomalía: el reservorio baja sin comando de riego…”.</td><td>${run('f:relay')}</td></tr>
+      <tr><td>Batería degradada</td><td>La capacidad útil baja de 84 Wh a 42 Wh.</td><td>Ícono ⚠ en la batería; la carga se descarga el doble de rápido.</td><td>“Capacidad efectiva de la batería reducida a ≈ 42 Wh…”.</td><td>${run('f:batt')}</td></tr>
+    </tbody></table></div><p class="d">Pulsa el mismo botón otra vez para quitar la falla. También puedes usar los interruptores rojos de la pestaña “Fallas, OTA y hardware”.</p>`}
+  ]},
+  {id:'faq',title:'Preguntas frecuentes',sections:[
+    {id:'f1',faq:true,h:'¿Por qué no riega aunque el suelo está seco?',kw:'riego no riega bomba',html:`<p>Revisa cuatro cosas: 1) que esté en <b>AUTO</b> (en MANUAL tú controlas la bomba); 2) que el <b>sensor de suelo</b> no tenga una falla (lectura “ERR”); 3) que el <b>reservorio</b> tenga más de 50 mL; 4) que la batería no esté en <b>LVD</b>. Además, en AUTO la bomba pulsa 1 minuto y descansa 4 para que el agua se infiltre.</p>`},
+    {id:'f2',faq:true,h:'¿Por qué la luz LED bajó sola?',kw:'led bajó atenuó ia',html:`<p>Con la IA encendida, el LED se atenúa si hace calor, si está nublado o lloviendo con poca batería, o si la batería baja de 35 % o de 20 %. El motivo aparece en la tarjeta Actuadores y en el Monitor serie.</p>`},
+    {id:'f3',faq:true,h:'¿Por qué se apagó todo de noche?',kw:'apagó noche lvd batería',html:`<p>La batería llegó a ≈ 8 % y el regulador activó el <b>LVD</b> para protegerla. Las cargas vuelven cuando la batería se recarga hasta 15 % (normalmente al día siguiente, con sol).</p>`},
+    {id:'f4',faq:true,h:'¿Qué significa “ERR” en la pantalla?',kw:'err error pantalla lectura',html:`<p>Que esa lectura no es válida: el sensor está desconectado (falla inyectada) o el sistema no tiene energía (LVD).</p>`},
+    {id:'f5',faq:true,h:'¿Por qué la temperatura no baja aunque el ventilador está encendido?',kw:'temperatura ventilador no baja calor',html:`<p>El ventilador solo cambia el aire de la caja por el de afuera. Si el aire exterior está más caliente que el objetivo (por ejemplo, en una ola de calor), ventilar no alcanza. El Análisis IA lo avisa.</p>`},
+    {id:'f6',faq:true,h:'¿Se guardan mis cambios?',kw:'guardar cambios umbrales tema etiquetas navegador',html:`<p>Sí, en este navegador: los umbrales, el tema, las etiquetas y la opción de mostrar la ayuda al iniciar. El estado de la simulación (hora, batería, reservorio) empieza de nuevo cada vez que abres la página.</p>`},
+    {id:'f7',faq:true,h:'¿Esto controla un prototipo real?',kw:'real hardware conexión',html:`<p>No. Es una simulación educativa con física simplificada; sirve para aprender, presentar y probar ideas antes de armar o programar el prototipo.</p>`},
+    {id:'f8',faq:true,h:'¿Por qué el ventilador está encendido de noche?',kw:'ventilador noche humedad',html:`<p>Porque la humedad del aire supera el máximo (80 % por defecto) o porque el DHT22 está en falla, y entonces el ventilador queda encendido por seguridad.</p>`},
+    {id:'f9',faq:true,h:'¿Por qué no se instala la actualización OTA?',kw:'ota no instala firmware batería',html:`<p>Se rechaza si la batería está por debajo de 25 % o si hay LVD. Espera a que la batería se cargue con el sol.</p>`},
+    {id:'f10',faq:true,h:'¿Cómo vuelvo todo a la normalidad?',kw:'reset restablecer normal',html:`<p>Pulsa <b>Reset</b> en la fila de escenarios. Los umbrales que guardaste se mantienen; cámbialos en la pestaña Umbrales si quieres volver a los valores originales (25 °C, 45 %, 60 %, 80 %).</p>`}
+  ]}
+]};
+const CARD_HELP={'card-display':'modos','card-energy':'energia','card-env':'temperatura','card-act':'u-manual','card-res':'reservorio','card-trend':'u-tendencias','card-tabs':'pestanas'};
+const COMP_HELP={sky:'reservorio',panel:'energia',enclosure:'temperatura',plant:'leyenda',led:'luz',fan:'temperatura',dht:'temperatura',soil:'riego',drip:'riego',pump:'riego',reservoir:'reservorio',battery:'energia',controller:'energia',buck:'energia',arduino:'modos',esp:'u-ota',hc05:'comunicacion',relay:'riego',display:'modos',switch:'modos'};
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const strip=h=>h.replace(/<svg[\s\S]*?<\/svg>/g,' ').replace(/<[^>]+>/g,' ');
+HELP.tabs.forEach(t=>t.sections.forEach(s=>{s._txt=norm(s.h+' '+strip(s.html)+' '+(s.kw||''));}));
+
+let helpTab='inicio',helpOpener=null;
+const helpOpen=()=>!$('helpBack').hidden;
+function sectionEl(s,tag,forceOpen){
+  let e;
+  if(s.faq){e=document.createElement('details');e.className='hs';const sm=document.createElement('summary');sm.textContent=s.h;if(tag){const t=document.createElement('span');t.className='tag';t.textContent=tag;sm.append(t);}e.append(sm);const d=document.createElement('div');d.innerHTML=s.html;e.append(d);if(forceOpen)e.open=true;}
+  else{e=document.createElement('section');e.className='hs';const h=document.createElement('h3');h.textContent=s.h;if(tag){const t=document.createElement('span');t.className='tag';t.textContent=tag;h.append(t);}e.append(h);const d=document.createElement('div');d.innerHTML=s.html;e.append(d);}
+  e.id='h-'+s.id;return e;
+}
+function renderHelp(){
+  const q=norm($('helpQ').value.trim());
+  const tabs=$('helpTabs');tabs.innerHTML='';
+  HELP.tabs.forEach(t=>{
+    const b=document.createElement('button');b.setAttribute('role','tab');b.id='ht-'+t.id;b.textContent=t.title;
+    const on=!q&&t.id===helpTab;b.setAttribute('aria-selected',on);b.tabIndex=on||(q&&t===HELP.tabs[0])?0:-1;
+    b.onclick=()=>{helpTab=t.id;$('helpQ').value='';renderHelp();$('helpBody').scrollTop=0;};
+    tabs.append(b);
+  });
+  const body=$('helpBody');body.innerHTML='';
+  if(q){
+    const hits=[];HELP.tabs.forEach(t=>t.sections.forEach(s=>{if(s._txt.includes(q))hits.push([t,s]);}));
+    const p=document.createElement('p');p.className='d';p.setAttribute('role','status');p.style.margin='0';
+    p.textContent=hits.length?`${hits.length} ${hits.length===1?'sección encontrada':'secciones encontradas'} para “${$('helpQ').value.trim()}”.`:`Sin resultados para “${$('helpQ').value.trim()}”. Prueba con: batería, riego, LVD, ventilador.`;
+    body.append(p);hits.forEach(([t,s])=>body.append(sectionEl(s,t.title,true)));
+    body.removeAttribute('aria-labelledby');
+  }else{
+    HELP.tabs.find(t=>t.id===helpTab).sections.forEach(s=>body.append(sectionEl(s)));
+    body.setAttribute('aria-labelledby','ht-'+helpTab);
+  }
+  body.querySelectorAll('[data-run]').forEach(b=>{
+    const k=b.dataset.run;
+    if(k.startsWith('f:'))b.textContent=S.faults[k.slice(2)]?'Quitar falla':'Probar ahora';
+    b.onclick=()=>runHelp(k);
+  });
+}
+$('helpTabs').addEventListener('keydown',e=>{
+  if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+  const i=HELP.tabs.findIndex(t=>t.id===helpTab),n=HELP.tabs.length;
+  helpTab=HELP.tabs[(i+(e.key==='ArrowRight'?1:n-1))%n].id;$('helpQ').value='';renderHelp();$('ht-'+helpTab).focus();e.preventDefault();
+});
+function runHelp(k){
+  if(k==='tour'){startTour();return;}
+  closeHelp(true);
+  if(k.startsWith('sc:'))runScenario(k.slice(3));
+  else if(k.startsWith('f:'))toggleFault(k.slice(2));
+  dirty=true;
+}
+function openHelp(sec){
+  const a=document.activeElement;
+  helpOpener=(a&&a!==document.body&&a.tagName==='BUTTON')?a:$('helpBtn');
+  if(sec){const t=HELP.tabs.find(t=>t.sections.some(s=>s.id===sec));if(t)helpTab=t.id;}
+  $('helpQ').value='';
+  $('helpNo').checked=LS.get('cafe01.help.seen')==='1';
+  $('helpBack').hidden=false;document.body.style.overflow='hidden';
+  renderHelp();
+  const body=$('helpBody');body.scrollTop=0;
+  if(sec){const e=$('h-'+sec);if(e){if(e.tagName==='DETAILS')e.open=true;body.scrollTop=e.offsetTop-body.offsetTop-6;e.classList.add('flash');setTimeout(()=>e.classList.remove('flash'),1800);}}
+  setTimeout(()=>{const t=$('ht-'+helpTab);(t||$('helpX')).focus();},0);
+}
+function closeHelp(silent){
+  if(!helpOpen())return;
+  $('helpBack').hidden=true;document.body.style.overflow='';
+  if(!silent&&helpOpener&&document.contains(helpOpener))helpOpener.focus();
+}
+$('helpBtn').onclick=()=>openHelp();
+$('helpX').onclick=()=>closeHelp();
+$('helpBack').addEventListener('mousedown',e=>{if(e.target===$('helpBack'))closeHelp();});
+$('helpQ').addEventListener('input',renderHelp);
+$('helpNo').addEventListener('change',e=>LS.set('cafe01.help.seen',e.target.checked?'1':'0'));
+$('tourBtnF').onclick=()=>startTour();
+$('infoHelp').onclick=()=>openHelp(COMP_HELP[sel]||'flujo');
+// Focus trap inside the dialog
+$('help').addEventListener('keydown',e=>{
+  if(e.key!=='Tab')return;
+  const f=[...$('help').querySelectorAll('button:not([disabled]),input,summary,[href],[tabindex]:not([tabindex="-1"])')].filter(x=>x.offsetParent!==null&&x.tabIndex>=0);
+  if(!f.length)return;
+  const first=f[0],lastE=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){lastE.focus();e.preventDefault();}
+  else if(!e.shiftKey&&document.activeElement===lastE){first.focus();e.preventDefault();}
+});
+// Contextual "?" buttons on dashboard cards
+Object.entries(CARD_HELP).forEach(([cid,sec])=>{
+  const card=$(cid);if(!card)return;
+  const b=document.createElement('button');b.className='hq';b.type='button';b.textContent='?';
+  const h2=card.querySelector('h2');
+  const name=h2?h2.firstChild.textContent.trim():'Pestañas';
+  b.setAttribute('aria-label','Ayuda: '+name);b.title='¿Cómo funciona? · '+name;
+  b.onclick=e=>{e.stopPropagation();openHelp(sec);};
+  if(h2){const tn=h2.firstChild;const w=document.createElement('span');w.className='ttl';h2.insertBefore(w,tn);w.append(tn,b);}
+  else card.querySelector('.tabs').append(b);
+});
+// Tooltips
+document.querySelectorAll('#speed button').forEach(b=>b.title=`${b.dataset.s} minuto${b.dataset.s==='1'?'':'s'} simulado${b.dataset.s==='1'?'':'s'} por segundo`);
+const SC_TIP={hot:'12:00, cielo despejado y ola de calor (+6 °C)',storm:'15:00 con lluvia: el reservorio se recarga y cae la generación solar',dry:'Suelo en 31 % y reservorio con 260 mL',night:'20:00, nublado y batería en 11,5 %: termina en LVD',reset:'Vuelve al estado inicial'};
+document.querySelectorAll('#scen button').forEach(b=>b.title=SC_TIP[b.dataset.sc]);
+const F_TIP={dht:'Simula el DHT22 desconectado',soil:'Simula el cable de señal del sensor de suelo suelto',relay:'Simula los contactos del relé soldados',batt:'Simula una batería con la mitad de capacidad'};
+Object.entries(F_TIP).forEach(([k,t])=>$('f-'+k).title=t);
+$('p15').title='Adelanta 15 minutos simulados';$('p60').title='Adelanta 1 hora simulada';
+$('theme').title='Cambia entre tema automático, claro y oscuro';$('lblsw').title='Muestra u oculta los nombres de las piezas';
+
+/* ---------- Guided tour ---------- */
+const TOUR=[
+  {sel:'#top .simctl',h:'Tiempo y velocidad',p:'Pausa o reanuda la simulación y elige cuántos minutos simulados pasan por segundo. +15 min y +1 h adelantan el reloj al instante.'},
+  {sel:'#scen',h:'Escenarios',p:'Prepara situaciones completas con un clic: calor de mediodía, tormenta, sequía o noche con batería baja. Reset vuelve al inicio.'},
+  {sel:'.scene-wrap',h:'El modelo del prototipo',p:'Todo se mueve según los datos: el ventilador gira, el LED brilla, el suelo cambia de color y el agua corre por la manguera. Puedes hacer clic en cualquier pieza.'},
+  {sel:'#info',pre:()=>openInfo('fan'),h:'Ficha del componente',p:'Al hacer clic en una pieza aparece su ficha: datos en vivo, pin del Arduino, costo y acciones rápidas. Aquí ves la del ventilador.'},
+  {sel:'#card-display',h:'Pantalla, AUTO/MANUAL e IA',p:'La pantalla integrada muestra lo mismo que la del prototipo. Debajo eliges el modo (interruptor físico) y enciendes o apagas el control climático IA.'},
+  {sel:'#card-energy',h:'Energía',p:'Carga de la batería, generación del panel, consumo y balance. Si el balance es negativo, verás cuánto falta para el LVD.'},
+  {sel:'#card-env',h:'Ambiente',p:'Temperatura y humedad del aire (DHT22) y humedad del suelo (A0), con píldoras de estado de colores.'},
+  {sel:'#card-act',h:'Actuadores',p:'Estado del LED, la bomba y el ventilador. En MANUAL los controlas desde aquí; el riego puntual funciona en ambos modos.'},
+  {sel:'#card-res',h:'Reservorio y clima',p:'Nivel de agua de lluvia y el clima exterior. Prueba “Lluvia” o la ola de calor y mira el modelo.'},
+  {sel:'#card-tabs',h:'Monitor, IA, umbrales y fallas',p:'El Monitor serie registra cada decisión; el Análisis IA la explica; en Umbrales ajustas los valores; en Fallas pruebas qué pasa si algo se rompe.'}
+];
+let tourI=0,tourWas=true,tourInfo=false;
+const tourOn=()=>!$('tour').hidden;
+function startTour(){
+  closeHelp(true);
+  tourWas=S.running;S.running=false;tourInfo=false;dirty=true;
+  $('tour').hidden=false;document.body.style.overflow='';
+  goTour(0);
+}
+function goTour(i){
+  tourI=clamp(i,0,TOUR.length-1);
+  const st=TOUR[tourI];
+  if(st.pre&&$('info').hidden){st.pre();tourInfo=true;}
+  const t=document.querySelector(st.sel);
+  if(t){
+    t.scrollIntoView({block:'center',behavior:'auto'});
+    // keep the target below the sticky top bar
+    if(!t.closest('#top')){const hh=$('top').offsetHeight,r=t.getBoundingClientRect();if(r.top<hh+8)window.scrollBy(0,r.top-hh-8);}
+  }
+  $('tourN').textContent=`${tourI+1} / ${TOUR.length}`;
+  $('tourT').textContent=st.h;$('tourP').textContent=st.p;
+  $('tourPrev').disabled=tourI===0;
+  $('tourNext').textContent=tourI===TOUR.length-1?'Terminar':'Siguiente';
+  requestAnimationFrame(()=>{placeTour();$('tourNext').focus();});
+  setTimeout(placeTour,120);
+}
+function placeTour(){
+  if(!tourOn())return;
+  const t=document.querySelector(TOUR[tourI].sel);if(!t)return;
+  const r=t.getBoundingClientRect(),pad=6,vw=innerWidth,vh=innerHeight;
+  const top=Math.max(4,r.top-pad),bot=Math.min(vh-4,r.bottom+pad);
+  const hole=$('tourHole');
+  Object.assign(hole.style,{left:(r.left-pad)+'px',top:top+'px',width:(r.width+pad*2)+'px',height:Math.max(0,bot-top)+'px'});
+  const card=$('tourCard');
+  if(vw<600){card.style.left='';card.style.top='';return;}
+  const cw=card.offsetWidth,ch=card.offsetHeight;
+  let x,y;
+  if(vh-bot>ch+16){y=bot+10;x=r.left;}
+  else if(top>ch+16){y=top-ch-10;x=r.left;}
+  else if(vw-r.right>cw+24){x=r.right+14;y=r.top;}
+  else if(r.left>cw+24){x=r.left-cw-14;y=r.top;}
+  else{x=vw-cw-16;y=vh-ch-16;}
+  card.style.left=clamp(x,12,vw-cw-12)+'px';card.style.top=clamp(y,12,vh-ch-12)+'px';
+}
+function endTour(){
+  if(!tourOn())return;
+  $('tour').hidden=true;
+  S.running=tourWas;dirty=true;
+  if(tourInfo)closeInfo();
+  $('helpBtn').focus();
+}
+$('tourPrev').onclick=()=>goTour(tourI-1);
+$('tourNext').onclick=()=>{if(tourI>=TOUR.length-1)endTour();else goTour(tourI+1);};
+$('tourExit').onclick=endTour;
+$('tourCard').addEventListener('keydown',e=>{
+  if(e.key!=='Tab')return;
+  const f=[...$('tourCard').querySelectorAll('button:not([disabled])')];
+  const i=f.indexOf(document.activeElement);
+  e.preventDefault();f[(i+(e.shiftKey?f.length-1:1))%f.length].focus();
+});
+window.addEventListener('scroll',()=>{if(tourOn())placeTour();},{passive:true});
+window.addEventListener('resize',()=>{if(tourOn())placeTour();});
+
+/* ---------- Keyboard shortcuts (capture phase, before other handlers) ---------- */
+document.addEventListener('keydown',e=>{
+  const tag=(e.target&&e.target.tagName)||'';
+  const typing=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+  if(tourOn()){
+    if(e.key==='Escape'){endTour();e.preventDefault();e.stopImmediatePropagation();}
+    else if(e.key==='ArrowRight'){$('tourNext').click();e.preventDefault();}
+    else if(e.key==='ArrowLeft'&&tourI>0){goTour(tourI-1);e.preventDefault();}
+    return;
+  }
+  if(helpOpen()){
+    if(e.key==='Escape'){closeHelp();e.preventDefault();e.stopImmediatePropagation();}
+    else if(e.key==='F1')e.preventDefault();
+    return;
+  }
+  if(e.key==='F1'||(e.key==='?'&&!typing)){e.preventDefault();openHelp();}
+},true);
+
 /* =====================================================================
    Boot + main loop
    ===================================================================== */
@@ -1584,6 +1997,8 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+// First visit: open help on "Inicio rápido" (value '1' = do not show again at startup)
+(function(){const v=LS.get('cafe01.help.seen');if(v!=='1'){if(v===null)LS.set('cafe01.help.seen','1');setTimeout(()=>{if(!helpOpen()&&!tourOn())openHelp('inicio-pasos');},350);}})();
 window.CAFE01={get state(){return S;},step,runScenario,openInfo,render}; // debugging hook
 })();
 </script>
