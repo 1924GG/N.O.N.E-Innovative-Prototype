@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAFÉ-01 · Gemelo digital · Coffee Guard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: model pane (sticky, left) + dashboard column (right); stacked under 900 px */
+  --bg:#ECEFEA; --surface:#FFFFFF; --soft:#F4F6F2; --ink:#1B241E; --muted:#5B685F; --line:#D1D8D0;
+  --accent:#8C2D2B; --accent-ink:#FFFFFF;
+  --ok:#2E6A44; --warn:#9A5F0C; --crit:#B42318; --water:#2A64A6; --sun:#B57A12;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --halo:#FFFFFF; --lbl:#14201A;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101512; --surface:#19201B; --soft:#141A16; --ink:#E3EAE4; --muted:#93A198; --line:#2C3630;
+    --accent:#DA7A6D; --accent-ink:#1C0F0D;
+    --ok:#62B882; --warn:#E2AA4C; --crit:#F27D70; --water:#72AAE8; --sun:#E6B04F;
+    --halo:#0E1411; --lbl:#E3EAE4;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101512; --surface:#19201B; --soft:#141A16; --ink:#E3EAE4; --muted:#93A198; --line:#2C3630;
+  --accent:#DA7A6D; --accent-ink:#1C0F0D;
+  --ok:#62B882; --warn:#E2AA4C; --crit:#F27D70; --water:#72AAE8; --sun:#E6B04F;
+  --halo:#0E1411; --lbl:#E3EAE4;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.d{font-size:12px;color:var(--muted)}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,.comp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Top bar */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1500px;margin:0 auto;padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between}
+.top-in.row2{padding-top:0;justify-content:flex-start}
+.brand{display:flex;flex-direction:column;min-width:0}
+.dev{font:700 20px/1.1 var(--display);letter-spacing:.03em}
+.sub{font-size:12px;color:var(--muted)}
+.clock{display:flex;align-items:center;gap:8px}
+#clk{font:600 26px/1 var(--mono)}
+.simctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+/* Common */
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--body);text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);white-space:nowrap}
+.pill.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.pill.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:color-mix(in srgb,var(--warn) 10%,var(--surface))}
+.pill.crit{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 50%,transparent);background:color-mix(in srgb,var(--crit) 11%,var(--surface))}
+.pill.sun{color:var(--sun);border-color:color-mix(in srgb,var(--sun) 45%,transparent);background:color-mix(in srgb,var(--sun) 10%,var(--surface))}
+.pill.info{color:var(--water);border-color:color-mix(in srgb,var(--water) 45%,transparent);background:color-mix(in srgb,var(--water) 9%,var(--surface))}
+.pill.mute{color:var(--muted)}
+.btn{font:600 13px/1 var(--body);padding:10px 12px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn.sm{padding:7px 10px;font-size:12px}
+.btn:hover:not(:disabled){filter:brightness(1.06)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{font:600 12px/1 var(--mono);padding:10px 10px;border:0;background:transparent;color:var(--muted);cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg.wide{display:grid;grid-template-columns:repeat(4,1fr);width:100%}
+.seg.wide button{font-family:var(--body);font-size:12px;padding:10px 4px}
+.sw{flex:none;width:46px;height:26px;border-radius:999px;border:1px solid var(--line);background:var(--soft);position:relative;cursor:pointer;padding:0}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:left .15s}
+.sw[aria-checked="true"]{background:var(--ok);border-color:var(--ok)}
+.sw[aria-checked="true"]::after{left:22px;background:#fff}
+.sw.danger[aria-checked="true"]{background:var(--crit);border-color:var(--crit)}
+.sw:disabled{opacity:.4;cursor:not-allowed}
+.bar{height:10px;border-radius:999px;background:var(--soft);border:1px solid var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=range]:disabled{opacity:.4}
+
+/* Layout */
+.layout{max-width:1500px;margin:0 auto;padding:14px 16px 44px;display:grid;grid-template-columns:1fr;gap:14px}
+.modelpane{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;position:relative;min-width:0;overflow:hidden}
+@media (min-width:900px){
+  .layout{grid-template-columns:55fr 45fr;align-items:start}
+  .modelpane{position:sticky;top:calc(var(--hh,112px) + 12px);max-height:calc(100vh - var(--hh,112px) - 26px)}
+  #scene{max-height:calc(100vh - var(--hh,112px) - 84px)}
+}
+.mp-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.ph{margin:0;font:600 13px/1.2 var(--display);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.scene-wrap{min-height:0;display:flex;align-items:center;justify-content:center;border-radius:8px;overflow:hidden}
+#scene{width:100%;height:auto;display:block}
+@media (min-width:900px){#scene{max-height:calc(100vh - var(--hh,112px) - 84px)}}
+.dash{display:flex;flex-direction:column;gap:12px;min-width:0}
+.alarms{display:flex;flex-wrap:wrap;gap:6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0;transition:box-shadow .25s,border-color .25s}
+.card.flash,.card.lnk{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 35%,transparent)}
+.card h2{margin:0;font:600 13px/1.2 var(--display);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
+
+/* SVG model */
+.comp{cursor:pointer}
+.comp:focus{outline:none}
+.comp .hl{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:6 4;opacity:0;pointer-events:none;transition:opacity .15s}
+.comp:hover .hl,.comp:focus-visible .hl,.comp.lnk .hl{opacity:.9}
+.comp.sel .hl{opacity:1;stroke-dasharray:none;stroke-width:3}
+.comp[data-comp="sky"]:hover .hl{opacity:.45}
+.callout{font:600 12px var(--body);fill:var(--lbl);paint-order:stroke;stroke:var(--halo);stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
+.leader{stroke:var(--lbl);stroke-width:1;opacity:.55;pointer-events:none}
+#labels.off{display:none}
+.silk{font:600 8.5px var(--mono);fill:#D5E1E7;pointer-events:none}
+.silk.dk{fill:#3B4A52}
+.wire{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.p12{stroke:#B8372E}.p5{stroke:#D99A2B}.dat{stroke:#3F7FCC}
+.flow{fill:none;stroke:#FFF1B8;stroke-width:1.8;stroke-dasharray:4 10;stroke-linecap:round;opacity:0;pointer-events:none}
+
+/* Info panel */
+.info{position:absolute;left:12px;right:12px;bottom:12px;max-height:52%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:8px;z-index:3}
+.info[hidden]{display:none}
+.info.top{top:52px;bottom:auto}
+@media (max-width:899px){.info,.info.top{position:static;max-height:none;box-shadow:none}}
+.info header{display:flex;align-items:center;gap:10px}
+.info .ic{flex:none;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:22px;background:var(--soft);border:1px solid var(--line)}
+.info h3{margin:0;font:700 16px/1.2 var(--display);letter-spacing:.02em}
+.info .x{margin-left:auto;flex:none;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:18px;cursor:pointer}
+.info p{margin:0;font-size:13px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:0;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font:600 13px var(--mono);font-variant-numeric:tabular-nums}
+.acts{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:8px}
+.acts .rowa{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* Display card */
+.oled{background:#04080A;border-radius:8px;border:7px solid #22292C;padding:12px 14px;box-shadow:inset 0 0 18px rgba(0,0,0,.7)}
+.oled pre{margin:0;font:500 15px/1.55 var(--mono);color:#8BE6F2;text-shadow:0 0 6px rgba(139,230,242,.45);white-space:pre;overflow:hidden}
+.oled.off pre{color:#0E1B1F;text-shadow:none}
+.ctlrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctl{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ctl .seg{width:100%;display:grid;grid-template-columns:1fr 1fr}
+.lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* Tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.tile .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tile .v{font:600 22px/1.1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tile .v small{font-size:12px;color:var(--muted);font-weight:500}
+.tile .pill{align-self:flex-start}
+.battrow{display:flex;align-items:center;gap:14px}
+.bigv{font:600 34px/1 var(--mono)}
+.bm{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+
+/* Actuators */
+.act{display:flex;flex-direction:column;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.act:first-of-type{border-top:0;padding-top:0}
+.act-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.act .name{font-weight:600}
+.state{font:600 12px/1 var(--mono);padding:6px 8px;border-radius:6px;white-space:nowrap}
+.state.on{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.state.off{background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.state.bad{background:color-mix(in srgb,var(--crit) 15%,transparent);color:var(--crit)}
+.manual{display:flex;align-items:center;gap:10px}
+.manual .d{flex:none}
+
+/* Reservoir */
+.res{display:flex;align-items:flex-end;gap:14px}
+.tank{width:46px;height:84px;border:2px solid var(--line);border-radius:6px 6px 8px 8px;position:relative;overflow:hidden;background:var(--soft);flex:none}
+.tank>i{position:absolute;left:0;right:0;bottom:0;background:var(--water);opacity:.85;transition:height .25s}
+
+/* Trends */
+.sparks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.spark{display:flex;flex-direction:column;gap:4px;min-width:0}
+.spark-h{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.spark-h b{font:600 12px var(--mono);color:var(--ink)}
+.spark canvas{width:100%;height:64px;display:block}
+.axis{display:flex;justify-content:space-between;font:10px var(--mono);color:var(--muted)}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{font:600 13px var(--body);padding:10px 12px;border:0;background:none;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel[hidden]{display:none}
+.serial{background:#0A0E0C;color:#C7D4CA;font:12px/1.6 var(--mono);border-radius:8px;padding:10px 12px;height:300px;overflow:auto;margin:0}
+.serial div{white-space:pre-wrap;word-break:break-word}
+.serial .t{color:#6E7F73}
+.serial .w{color:#F2C46B}.serial .c{color:#FF8E7E}.serial .o{color:#7FD69A}.serial .a{color:#9CC7FF}
+.ailog{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto}
+.ai{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)}
+.ai header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;color:var(--muted)}
+.ai ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.ai li{font-size:13px;padding-left:10px;border-left:3px solid var(--line)}
+.ai li.w{border-left-color:var(--warn)}.ai li.c{border-left-color:var(--crit)}.ai li.o{border-left-color:var(--ok)}.ai li.a{border-left-color:var(--water)}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:var(--muted)}
+.field input{font:600 16px var(--mono);padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);width:100%}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .d{max-width:52ch}
+.pins{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;margin:0}
+.pins dt{font:600 12px var(--mono);color:var(--accent)}
+.pins dd{margin:0}
+.sub2{font:600 12px var(--display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 0 0}
+@media (max-width:420px){
+  .tile .v{font-size:19px}
+  .bigv{font-size:28px}
+  .ctlrow{grid-template-columns:1fr}
+  #clk{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="dev">CAFÉ-01 · Gemelo digital</span>
+      <span class="sub">Coffee Guard · Arduino + ESP8266 + solar</span>
+    </div>
+    <div class="clock">
+      <span id="clk">12:00</span>
+      <span class="d" id="dayn">Día 1</span>
+      <span class="pill sun" id="phase">Día</span>
+    </div>
+    <div class="simctl">
+      <button class="btn" id="play">Pausar</button>
+      <div class="seg" id="speed" role="group" aria-label="Velocidad de simulación">
+        <button data-s="1">1 min/s</button>
+        <button data-s="5" aria-pressed="true">5</button>
+        <button data-s="15">15</button>
+        <button data-s="60">60</button>
+      </div>
+      <button class="btn ghost" id="p15">+15 min</button>
+      <button class="btn ghost" id="p60">+1 h</button>
+      <button class="btn ghost" id="theme" aria-label="Cambiar tema">Tema: auto</button>
+    </div>
+  </div>
+  <div class="top-in row2">
+    <span class="lbl">Escenarios</span>
+    <div class="chips" id="scen">
+      <button class="btn ghost sm" data-sc="hot">Mediodía caluroso</button>
+      <button class="btn ghost sm" data-sc="storm">Tormenta</button>
+      <button class="btn ghost sm" data-sc="dry">Semana seca</button>
+      <button class="btn ghost sm" data-sc="night">Noche nublada con batería baja</button>
+      <button class="btn ghost sm" data-sc="reset">Reset</button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="modelpane" aria-label="Modelo del prototipo">
+    <div class="mp-h">
+      <h2 class="ph">Modelo del prototipo <span class="d" style="text-transform:none;letter-spacing:0">· haz clic en cualquier componente</span></h2>
+      <span class="manual"><button class="sw" id="lblsw" role="switch" aria-checked="true" aria-label="Mostrar etiquetas"></button><span class="d">Mostrar etiquetas</span></span>
+    </div>
+    <div class="scene-wrap">
+<svg id="scene" viewBox="0 0 900 720" xmlns="http://www.w3.org/2000/svg" role="group" aria-labelledby="sceneT">
+<title id="sceneT">Modelo animado del prototipo CAFÉ-01</title>
+<defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop id="sky0" offset="0" stop-color="#4E9CCB"/><stop id="sky1" offset="1" stop-color="#CFE6F0"/></linearGradient>
+  <linearGradient id="groundG" x1="0" y1="0" x2="0" y2="1"><stop id="gr0" offset="0" stop-color="#6F8F4E"/><stop id="gr1" offset="1" stop-color="#4C6236"/></linearGradient>
+  <linearGradient id="coneG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF4B8" stop-opacity=".95"/><stop offset="1" stop-color="#FFE27A" stop-opacity="0"/></linearGradient>
+  <linearGradient id="panelG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2D4F7A"/><stop offset="1" stop-color="#16294A"/></linearGradient>
+  <linearGradient id="shineG" x1="0" y1="0" x2="1" y2="1"><stop offset=".2" stop-color="#FFFFFF" stop-opacity="0"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity=".85"/><stop offset=".8" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+  <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFF6C9"/><stop offset=".5" stop-color="#FFD25A" stop-opacity=".7"/><stop offset="1" stop-color="#FFB300" stop-opacity="0"/></radialGradient>
+  <clipPath id="jugClip"><rect x="642" y="352" width="96" height="146" rx="10"/></clipPath>
+  <clipPath id="encClip"><rect x="280" y="150" width="280" height="350"/></clipPath>
+</defs>
+
+<!-- SKY (click = weather) -->
+<g class="comp" data-comp="sky">
+  <rect x="0" y="0" width="900" height="472" fill="url(#skyG)"/>
+  <g id="stars" fill="#FFFFFF"></g>
+  <g id="moon" opacity="0"><circle r="15" fill="#E8EEF5"/><circle cx="-4" cy="-3" r="3" fill="#C9D3DD"/><circle cx="5" cy="5" r="2.2" fill="#C9D3DD"/></g>
+  <g id="sun"><circle r="60" fill="url(#sunGlow)"/><circle r="24" fill="#FFD447"/></g>
+  <g id="clouds"></g>
+  <rect class="hl" x="4" y="4" width="892" height="462" rx="10"/>
+</g>
+
+<!-- Ground -->
+<rect x="0" y="470" width="900" height="250" fill="url(#groundG)"/>
+<path d="M0 472 Q120 456 240 470 T520 468 T900 464 L900 478 L0 478Z" fill="#5E7D43"/>
+<g id="rain" pointer-events="none" stroke="#B9D0E2" stroke-width="1.4" stroke-linecap="round" opacity="0"></g>
+
+<!-- Table + electronics shelf backdrop -->
+<rect x="220" y="500" width="570" height="12" fill="#8A5A35"/>
+<rect x="230" y="512" width="550" height="8" fill="#6E4527"/>
+<rect x="238" y="512" width="12" height="208" fill="#6E4527"/>
+<rect x="760" y="512" width="12" height="208" fill="#6E4527"/>
+<rect x="256" y="588" width="500" height="126" rx="8" fill="#263036" stroke="#41515A" stroke-width="2"/>
+<text x="748" y="708" text-anchor="end" class="silk">CAJA ELECTRÓNICA · 12 V</text>
+
+<!-- Wires (base + animated flow overlays) -->
+<g id="wires">
+  <path class="wire p12" d="M129 250 L129 566 Q129 578 141 578 L292 578 L292 608"/>
+  <path class="flow" id="fl-pv" d="M129 250 L129 566 Q129 578 141 578 L292 578 L292 608"/>
+  <path class="wire p12" d="M318 608 L318 597 L360 597 L360 606"/>
+  <path class="flow" id="fl-bat" d="M318 608 L318 597 L360 597 L360 606"/>
+  <path class="wire p5" d="M306 608 L306 584 L458 584 L458 610"/>
+  <path class="flow" id="fl-v5" d="M306 608 L306 584 L458 584 L458 610"/>
+  <path class="wire p12" d="M272 608 L272 136 L330 136 L330 152"/>
+  <path class="flow" id="fl-led" d="M272 608 L272 136 L330 136 L330 152"/>
+  <path class="wire p5" d="M470 610 L470 570 L614 570 L614 230 L554 230"/>
+  <path class="flow" id="fl-fan" d="M470 610 L470 570 L614 570 L614 230 L554 230"/>
+  <path class="wire p12" d="M690 606 L690 560 L676 560 L676 494"/>
+  <path class="flow" id="fl-pump" d="M690 606 L690 560 L676 560 L676 494"/>
+  <path class="wire dat" id="w-dht" d="M500 606 L500 562 L254 562 L254 128 L320 128 L320 232"/>
+  <path class="wire dat" id="w-soil" d="M528 606 L528 404 Q528 396 520 396 L482 396"/>
+</g>
+<g id="sparkDht" display="none" pointer-events="none"></g>
+<g id="sparkSoil" display="none" pointer-events="none"></g>
+
+<!-- Solar panel -->
+<g class="comp" data-comp="panel">
+  <rect x="117" y="236" width="8" height="236" fill="#6F7A80"/>
+  <rect x="104" y="466" width="34" height="8" rx="2" fill="#555F65"/>
+  <polygon points="34,206 196,176 208,232 46,262" fill="url(#panelG)" stroke="#1E2A36" stroke-width="3"/>
+  <g stroke="#9FB7CF" stroke-width="1" opacity=".55">
+    <line x1="74.5" y1="198.5" x2="86.5" y2="254.5"/><line x1="115" y1="191" x2="127" y2="247"/><line x1="155.5" y1="183.5" x2="167.5" y2="239.5"/><line x1="40" y1="234" x2="202" y2="204"/>
+  </g>
+  <polygon id="panelShine" points="34,206 196,176 208,232 46,262" fill="url(#shineG)" opacity="0"/>
+  <rect class="hl" x="26" y="166" width="192" height="104" rx="6"/>
+</g>
+
+<!-- Enclosure back faces -->
+<g class="comp" data-comp="enclosure">
+  <polygon points="280,500 560,500 600,470 320,470" fill="#CBD6DC" fill-opacity=".5"/>
+  <polygon points="280,150 560,150 600,120 320,120" fill="#DCEBF4" fill-opacity=".45" stroke="#8EA6B4" stroke-width="2"/>
+  <polygon points="560,150 600,120 600,470 560,500" fill="#C9DDE9" fill-opacity=".35" stroke="#8EA6B4" stroke-width="2"/>
+  <rect x="280" y="150" width="280" height="350" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/>
+  <rect class="hl" x="272" y="112" width="336" height="396" rx="6"/>
+</g>
+
+<!-- Irrigation tube -->
+<path id="tube" d="M668 470 L668 392 Q668 378 654 378 L600 378 Q586 378 586 392 L586 420 Q586 434 572 434 L480 434" fill="none" stroke="#A9CBE3" stroke-width="5" stroke-linecap="round"/>
+<path id="tubeFlow" d="M668 470 L668 392 Q668 378 654 378 L600 378 Q586 378 586 392 L586 420 Q586 434 572 434 L480 434" fill="none" stroke="#2A64A6" stroke-width="3" stroke-dasharray="5 9" stroke-linecap="round" opacity="0" pointer-events="none"/>
+
+<!-- Interior -->
+<rect id="encTint" x="280" y="150" width="280" height="350" fill="#3D8FD1" opacity=".08" pointer-events="none"/>
+<polygon id="ledCone" points="326,166 514,166 556,430 284,430" fill="url(#coneG)" opacity="0" clip-path="url(#encClip)" pointer-events="none"/>
+
+<g class="comp" data-comp="soil">
+  <rect x="467" y="396" width="14" height="60" rx="2" fill="#2E7D44" stroke="#1C4F2B"/>
+  <rect x="465" y="390" width="18" height="9" rx="1.5" fill="#1E1E1E"/>
+  <path d="M470 410 h8 M470 416 h8" stroke="#BFE3C8" stroke-width="1"/>
+  <rect class="hl" x="459" y="383" width="30" height="50" rx="4"/>
+</g>
+
+<g class="comp" data-comp="plant">
+  <polygon points="352,436 488,436 474,500 366,500" fill="#B5653A"/>
+  <rect x="346" y="428" width="148" height="11" rx="3" fill="#C97A4B"/>
+  <ellipse id="soilTop" cx="420" cy="431" rx="68" ry="6" fill="#6B4A2E"/>
+  <g id="cracks" stroke="#8C6A45" stroke-width="1.2" fill="none" opacity="0"><path d="M368 431 l8 2 l6 -2 M440 430 l7 2 l5 -1 M402 433 l6 -2 l5 1"/></g>
+  <path d="M420 431 C 417 400, 423 360, 420 290" stroke="#5B4528" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <g id="leaves"></g>
+  <g id="cherries" fill="#B3261E"><circle cx="425" cy="389" r="3.6"/><circle cx="430" cy="393" r="3.4"/><circle cx="415" cy="361" r="3.6"/><circle cx="410" cy="365" r="3.2"/><circle cx="426" cy="333" r="3.4"/><circle cx="431" cy="336" r="3"/></g>
+  <rect class="hl" x="340" y="268" width="160" height="238" rx="6"/>
+</g>
+
+<g class="comp" data-comp="drip">
+  <ellipse cx="420" cy="433" rx="58" ry="6" fill="none" stroke="#202426" stroke-width="3"/>
+  <g fill="#2A2F33"><rect x="359" y="430" width="6" height="6" rx="1"/><rect x="475" y="430" width="6" height="6" rx="1"/><rect x="392" y="435.5" width="6" height="6" rx="1"/><rect x="442" y="435.5" width="6" height="6" rx="1"/></g>
+  <g id="drops" fill="#58A8F0"></g>
+  <rect class="hl" x="352" y="422" width="136" height="30" rx="6"/>
+</g>
+
+<g class="comp" data-comp="dht">
+  <rect x="307" y="232" width="26" height="34" rx="3" fill="#F4F6F7" stroke="#8C979D"/>
+  <path d="M311 238 h18 M311 243 h18 M311 248 h18 M311 253 h18" stroke="#B7C1C6" stroke-width="1"/>
+  <text x="320" y="262" text-anchor="middle" class="silk dk" style="font-size:6.5px">DHT22</text>
+  <rect class="hl" x="300" y="224" width="40" height="48" rx="4"/>
+</g>
+
+<g class="comp" data-comp="led">
+  <rect x="318" y="152" width="204" height="14" rx="3" fill="#2A2F33"/>
+  <g id="ledD"></g>
+  <rect class="hl" x="312" y="146" width="216" height="26" rx="4"/>
+</g>
+
+<g class="comp" data-comp="fan">
+  <rect x="486" y="196" width="68" height="68" rx="8" fill="#1F2427" stroke="#3A4247"/>
+  <circle id="fanRing" cx="520" cy="230" r="30" fill="#2B3237" stroke="#3A4247" stroke-width="2"/>
+  <g id="fanBlades" fill="#AEB8BE">
+    <path d="M520 230 C 524 214, 538 205, 546 212 C 541 222, 532 228, 520 230Z"/>
+    <path d="M520 230 C 524 214, 538 205, 546 212 C 541 222, 532 228, 520 230Z" transform="rotate(72 520 230)"/>
+    <path d="M520 230 C 524 214, 538 205, 546 212 C 541 222, 532 228, 520 230Z" transform="rotate(144 520 230)"/>
+    <path d="M520 230 C 524 214, 538 205, 546 212 C 541 222, 532 228, 520 230Z" transform="rotate(216 520 230)"/>
+    <path d="M520 230 C 524 214, 538 205, 546 212 C 541 222, 532 228, 520 230Z" transform="rotate(288 520 230)"/>
+  </g>
+  <circle cx="520" cy="230" r="7" fill="#596268"/>
+  <g fill="#6C767C"><circle cx="492" cy="202" r="2.5"/><circle cx="548" cy="202" r="2.5"/><circle cx="492" cy="258" r="2.5"/><circle cx="548" cy="258" r="2.5"/></g>
+  <g id="fanAir" fill="none" stroke="#7FC3F0" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 8" opacity="0"><path d="M558 214 q20 -6 40 0"/><path d="M558 230 h46"/><path d="M558 246 q20 6 40 0"/></g>
+  <rect class="hl" x="480" y="190" width="80" height="80" rx="8"/>
+</g>
+
+<g id="cond" opacity="0" pointer-events="none"></g>
+<g id="shimmer" opacity="0" fill="none" stroke="#FF7A3C" stroke-width="2.6" stroke-linecap="round" pointer-events="none">
+  <path d="M322 108 q6 -7 12 0 t12 0 t12 0 t12 0"/><path d="M392 100 q6 -7 12 0 t12 0 t12 0 t12 0"/><path d="M462 108 q6 -7 12 0 t12 0 t12 0 t12 0"/><path d="M356 88 q6 -7 12 0 t12 0 t12 0"/><path d="M432 84 q6 -7 12 0 t12 0 t12 0"/>
+</g>
+<!-- Front acrylic (non-interactive so interior parts stay clickable) -->
+<rect x="280" y="150" width="280" height="350" fill="#D8EAF5" fill-opacity=".10" stroke="#8EA6B4" stroke-width="2" pointer-events="none"/>
+<polygon points="300,160 330,160 290,330 280,330 280,250" fill="#FFFFFF" opacity=".12" pointer-events="none"/>
+
+<!-- Reservoir + collector -->
+<g class="comp" data-comp="reservoir">
+  <polygon points="638,294 742,294 706,334 674,334" fill="#A7BCC7" stroke="#5F7682" stroke-width="2"/>
+  <rect x="676" y="333" width="28" height="19" fill="#C3D3DB" stroke="#5F7682"/>
+  <rect id="water" x="640" y="400" width="100" height="98" fill="#2A64A6" opacity=".75" clip-path="url(#jugClip)"/>
+  <rect x="640" y="350" width="100" height="150" rx="12" fill="#DCEBF4" fill-opacity=".22" stroke="#6E8794" stroke-width="2"/>
+  <path d="M740 372 q24 0 24 30 q0 30 -24 30" fill="none" stroke="#6E8794" stroke-width="4"/>
+  <g stroke="#6E8794" stroke-width="1.2"><path d="M642 388.5 h10 M642 425 h14 M642 461.5 h10"/></g>
+  <text x="660" y="428" class="silk dk">1 L</text>
+  <rect class="hl" x="630" y="286" width="140" height="222" rx="8"/>
+</g>
+<path id="overflow" d="M742 300 q10 6 10 30 l0 168" fill="none" stroke="#5DA9EE" stroke-width="3" stroke-dasharray="4 6" opacity="0" pointer-events="none"/>
+
+<g class="comp" data-comp="pump">
+  <rect id="pumpBody" x="652" y="470" width="32" height="24" rx="5" fill="#2E3438" stroke="#555" stroke-width="2"/>
+  <path d="M656 488 h24 M656 483 h24" stroke="#555"/>
+  <rect class="hl" x="646" y="464" width="44" height="36" rx="5"/>
+</g>
+
+<!-- Electronics row 1 -->
+<g class="comp" data-comp="controller">
+  <rect x="266" y="608" width="62" height="42" rx="4" fill="#1F5F9E" stroke="#163F69"/>
+  <rect x="272" y="614" width="50" height="15" rx="2" fill="#9FD29B"/>
+  <text id="ctrlTxt" x="297" y="625" text-anchor="middle" style="font:600 8.5px var(--mono);fill:#13321A">CHG 12,9</text>
+  <text x="297" y="643" text-anchor="middle" class="silk">PWM 20A</text>
+  <rect class="hl" x="261" y="603" width="72" height="52" rx="5"/>
+</g>
+<g class="comp" data-comp="battery">
+  <rect x="336" y="606" width="92" height="46" rx="4" fill="#202426" stroke="#555F65"/>
+  <rect x="346" y="601" width="10" height="6" fill="#C0392B"/><rect x="408" y="601" width="10" height="6" fill="#333"/>
+  <rect x="341" y="616" width="82" height="28" rx="2" fill="#11151A"/>
+  <rect id="battFill" x="342" y="617" width="60" height="26" rx="2" fill="#2E9A5A"/>
+  <text id="battTxt" x="382" y="635" text-anchor="middle" style="font:700 11px var(--mono);fill:#FFFFFF">78 %</text>
+  <g id="battWarn" display="none"><polygon points="430,594 443,616 417,616" fill="#F0B429" stroke="#7A5200"/><text x="430" y="613" text-anchor="middle" style="font:800 12px var(--body);fill:#3A2600">!</text></g>
+  <rect class="hl" x="331" y="597" width="102" height="60" rx="5"/>
+</g>
+<g class="comp" data-comp="buck">
+  <rect x="436" y="610" width="44" height="38" rx="3" fill="#1D4F8F" stroke="#143A69"/>
+  <rect x="442" y="616" width="22" height="10" rx="1" fill="#111"/>
+  <text x="453" y="624" text-anchor="middle" style="font:600 7.5px var(--mono);fill:#FF5A4F">5,0</text>
+  <rect x="468" y="616" width="7" height="9" fill="#2B6FD1"/>
+  <text x="458" y="642" text-anchor="middle" class="silk">LM2596</text>
+  <rect class="hl" x="431" y="605" width="54" height="48" rx="5"/>
+</g>
+<g class="comp" data-comp="arduino">
+  <rect x="488" y="606" width="96" height="46" rx="4" fill="#0E6E8E" stroke="#0A4F66"/>
+  <rect x="488" y="612" width="14" height="12" fill="#B9C2C7"/>
+  <rect x="520" y="626" width="40" height="12" rx="1" fill="#1A1A1A"/>
+  <circle id="ardPwr" cx="570" cy="613" r="2.6" fill="#5CF07A"/>
+  <circle id="ardTx" cx="576" cy="620" r="2.2" fill="#3A3A2A"/>
+  <text x="540" y="620" text-anchor="middle" class="silk">UNO R3</text>
+  <rect class="hl" x="483" y="601" width="106" height="56" rx="5"/>
+</g>
+<g class="comp" data-comp="esp">
+  <rect x="592" y="610" width="34" height="38" rx="3" fill="#1B1B1B" stroke="#333"/>
+  <path d="M597 616 h6 v6 h6 v-6 h6 v6 h6" fill="none" stroke="#C9A43A" stroke-width="1.6"/>
+  <circle id="espLed" cx="619" cy="640" r="2.4" fill="#123"/>
+  <text x="603" y="642" text-anchor="middle" class="silk" style="font-size:6.5px">ESP</text>
+  <rect class="hl" x="587" y="605" width="44" height="48" rx="5"/>
+</g>
+<g class="comp" data-comp="hc05">
+  <rect x="634" y="610" width="30" height="38" rx="3" fill="#1F4FA0" stroke="#163A78"/>
+  <circle id="btLed" cx="657" cy="616" r="2.4" fill="#300"/>
+  <text x="649" y="636" text-anchor="middle" class="silk" style="font-size:6.5px">HC-05</text>
+  <rect class="hl" x="629" y="605" width="40" height="48" rx="5"/>
+</g>
+<g class="comp" data-comp="relay">
+  <rect id="relayBody" x="672" y="606" width="76" height="46" rx="4" fill="#1C3D6E" stroke="#2F5D96" stroke-width="2"/>
+  <g fill="#2D7BE0"><rect x="676" y="611" width="15" height="18" rx="1"/><rect x="694" y="611" width="15" height="18" rx="1"/><rect x="712" y="611" width="15" height="18" rx="1"/><rect x="730" y="611" width="15" height="18" rx="1"/></g>
+  <circle id="rl0" cx="683.5" cy="637" r="2.6" fill="#3A1B1B"/><circle cx="701.5" cy="637" r="2.6" fill="#3A1B1B"/><circle cx="719.5" cy="637" r="2.6" fill="#3A1B1B"/><circle cx="737.5" cy="637" r="2.6" fill="#3A1B1B"/>
+  <text x="710" y="648" text-anchor="middle" class="silk" style="font-size:6.5px">CH1 BOMBA · 4CH</text>
+  <rect class="hl" x="667" y="601" width="86" height="56" rx="5"/>
+</g>
+
+<!-- Electronics row 2 -->
+<g class="comp" data-comp="display">
+  <rect x="266" y="662" width="210" height="46" rx="4" fill="#0B0F12" stroke="#3A4247" stroke-width="2"/>
+  <text id="dispTxt" style="font:500 9.5px var(--mono);fill:#8BE6F2">
+    <tspan x="274" y="674"></tspan><tspan x="274" y="684"></tspan><tspan x="274" y="694"></tspan><tspan x="274" y="704"></tspan>
+  </text>
+  <rect class="hl" x="261" y="657" width="220" height="56" rx="5"/>
+</g>
+<g class="comp" data-comp="switch">
+  <rect x="488" y="662" width="74" height="46" rx="4" fill="#33393D" stroke="#4A5257"/>
+  <text x="497" y="674" class="silk">AUTO</text><text x="538" y="674" class="silk">MAN</text>
+  <circle cx="525" cy="694" r="7" fill="#1E2326" stroke="#6A747A"/>
+  <g id="swLever" transform="rotate(-35 525 694)"><rect x="522.5" y="676" width="5" height="18" rx="2.5" fill="#D9DEE1"/><circle cx="525" cy="677" r="4" fill="#C0392B"/></g>
+  <rect class="hl" x="483" y="657" width="84" height="56" rx="5"/>
+</g>
+<g pointer-events="none">
+  <circle id="stPwr" cx="580" cy="672" r="3" fill="#5CF07A"/><text x="588" y="675" class="silk">PWR</text>
+  <circle id="stWifi" cx="625" cy="672" r="3" fill="#4FA3F7"/><text x="633" y="675" class="silk">WiFi</text>
+  <circle id="stBt" cx="672" cy="672" r="3" fill="#4F7BF7"/><text x="680" y="675" class="silk">BT</text>
+  <text id="fwTxt" x="580" y="692" class="silk">FW 1.4.1 · D7 relé · D5/D6 PWM</text>
+</g>
+
+<!-- Callout labels -->
+<g id="labels">
+  <text class="callout" x="30" y="158">Panel solar 20 W</text>
+  <text class="callout" x="340" y="98">Luz LED espectro completo</text>
+  <text class="callout" x="286" y="286">DHT22</text>
+  <text class="callout" x="474" y="186">Ventilador 5 V</text>
+  <text class="callout" x="290" y="352">Coffea arabica</text>
+  <line class="leader" x1="336" y1="356" x2="400" y2="376"/>
+  <text class="callout" x="484" y="378">Sensor suelo</text>
+  <text class="callout" x="290" y="470">Goteo</text>
+  <line class="leader" x1="326" y1="466" x2="358" y2="436"/>
+  <text class="callout" x="772" y="300">Colector</text>
+  <text class="callout" x="772" y="420">Reservorio 2 L</text>
+  <text class="callout" x="772" y="488">Bomba 12 V</text>
+  <line class="leader" x1="768" y1="484" x2="686" y2="482"/>
+</g>
+</svg>
+    </div>
+    <aside class="info" id="info" hidden aria-live="polite">
+      <header>
+        <span class="ic" id="infoIc" aria-hidden="true"></span>
+        <div><h3 id="infoN"></h3><span class="d mono" id="infoPin"></span></div>
+        <button class="x" id="infoX" aria-label="Cerrar panel">×</button>
+      </header>
+      <div class="manual"><span class="pill" id="infoSt"></span></div>
+      <p id="infoFn"></p>
+      <dl class="kv" id="infoLive"></dl>
+      <p class="d" id="infoSpec"></p>
+      <p class="d mono" id="infoCost"></p>
+      <div class="acts" id="infoActs"></div>
+    </aside>
+  </section>
+
+  <div class="dash">
+    <div class="alarms" id="alarms" aria-live="polite"></div>
+
+    <section class="card" id="card-display">
+      <h2>Pantalla integrada <span class="mono" id="fw">FW 1.4.1</span></h2>
+      <div class="oled" id="oled"><pre id="oledtxt"></pre></div>
+      <div class="ctlrow">
+        <div class="ctl">
+          <span class="lbl">Interruptor físico</span>
+          <div class="seg" id="mode" role="group" aria-label="Modo">
+            <button data-m="AUTO">AUTO</button><button data-m="MANUAL">MANUAL</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="lbl">Control climático IA</span>
+          <div class="seg" id="ai" role="group" aria-label="IA">
+            <button data-a="1">ENCENDIDA</button><button data-a="0">APAGADA</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="card-energy">
+      <h2>Energía <span class="pill" id="chg">Cargando</span></h2>
+      <div class="battrow">
+        <div class="bigv" id="soc">78 %</div>
+        <div class="bm">
+          <div class="bar"><i id="socbar"></i></div>
+          <div class="d mono" id="vbat"></div>
+        </div>
+      </div>
+      <div class="tiles">
+        <div class="tile"><span class="k">Panel solar</span><span class="v" id="pv"></span><span class="d" id="pvd"></span></div>
+        <div class="tile"><span class="k">Consumo</span><span class="v" id="load"></span><span class="d" id="loadd"></span></div>
+        <div class="tile"><span class="k">Balance</span><span class="v" id="net"></span><span class="d" id="netd"></span></div>
+      </div>
+    </section>
+
+    <section class="card" id="card-env">
+      <h2>Ambiente <span class="d" id="amb"></span></h2>
+      <div class="tiles">
+        <div class="tile"><span class="k">Temp. aire</span><span class="v" id="tv"></span><span class="pill" id="tp"></span><span class="d" id="td"></span></div>
+        <div class="tile"><span class="k">Humedad aire</span><span class="v" id="hv"></span><span class="pill" id="hp"></span><span class="d">DHT22 · D2</span></div>
+        <div class="tile"><span class="k">Humedad suelo</span><span class="v" id="sv"></span><span class="pill" id="sp"></span><span class="d mono" id="sd"></span></div>
+      </div>
+    </section>
+
+    <section class="card" id="card-act">
+      <h2>Actuadores <span class="d" id="actnote"></span></h2>
+      <div class="act">
+        <div class="act-h"><span class="name">Luces LED de cultivo</span><span class="state" id="ledst"></span></div>
+        <div class="bar"><i id="ledbar" style="background:var(--sun)"></i></div>
+        <div class="d" id="ledd"></div>
+        <div class="manual"><label class="d" for="ledsl">Intensidad manual</label><input type="range" id="ledsl" min="0" max="100" step="5" value="80"><span class="mono d" id="ledslv">80 %</span></div>
+      </div>
+      <div class="act">
+        <div class="act-h"><span class="name">Bomba sumergible 12 V</span><span class="state" id="pumpst"></span></div>
+        <div class="d" id="pumpd"></div>
+        <div class="manual" style="justify-content:space-between;flex-wrap:wrap">
+          <span class="manual"><button class="sw" id="pumpsw" role="switch" aria-checked="false" aria-label="Bomba manual"></button><span class="d">Bomba (manual)</span></span>
+          <button class="btn ghost" id="shot">Riego puntual · 4 pulsos (100 mL)</button>
+        </div>
+      </div>
+      <div class="act">
+        <div class="act-h"><span class="name">Ventilador 5 V CC</span><span class="state" id="fanst"></span></div>
+        <div class="d" id="fand"></div>
+        <div class="manual"><button class="sw" id="fansw" role="switch" aria-checked="false" aria-label="Ventilador manual"></button><span class="d">Ventilador (manual)</span></div>
+      </div>
+    </section>
+
+    <section class="card" id="card-res">
+      <h2>Reservorio de agua de lluvia <span class="pill" id="resp"></span></h2>
+      <div class="res">
+        <div class="tank" aria-hidden="true"><i id="tank"></i></div>
+        <div class="bm">
+          <div class="bigv" id="resv"></div>
+          <div class="d" id="resd"></div>
+          <div class="d" id="resd2"></div>
+        </div>
+      </div>
+      <span class="lbl">Clima exterior</span>
+      <div class="seg wide" id="wx" role="group" aria-label="Clima">
+        <button data-w="despejado">Despejado</button>
+        <button data-w="parcial">Parcial</button>
+        <button data-w="nublado">Nublado</button>
+        <button data-w="lluvia">Lluvia</button>
+      </div>
+      <div class="manual"><button class="sw danger" id="heat" role="switch" aria-checked="false" aria-label="Ola de calor"></button><span class="d">Ola de calor (+6 °C en el ambiente exterior)</span></div>
+    </section>
+
+    <section class="card" id="card-trend">
+      <h2>Tendencias · últimas 24 h</h2>
+      <div class="sparks">
+        <div class="spark"><div class="spark-h"><span>Temp. aire (°C)</span><b id="k-t"></b></div><canvas id="c-t"></canvas><div class="axis"><span>−24 h</span><span>ahora</span></div></div>
+        <div class="spark"><div class="spark-h"><span>Suelo (%)</span><b id="k-s"></b></div><canvas id="c-s"></canvas><div class="axis"><span>−24 h</span><span>ahora</span></div></div>
+        <div class="spark"><div class="spark-h"><span>Batería (%)</span><b id="k-b"></b></div><canvas id="c-b"></canvas><div class="axis"><span>−24 h</span><span>ahora</span></div></div>
+        <div class="spark"><div class="spark-h"><span>Solar (W)</span><b id="k-p"></b></div><canvas id="c-p"></canvas><div class="axis"><span>−24 h</span><span>ahora</span></div></div>
+      </div>
+      <p class="d" style="margin:0">Las líneas discontinuas marcan el objetivo de temperatura y los umbrales de riego.</p>
+    </section>
+
+    <section class="card" id="card-tabs">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="serial">Monitor serie</button>
+        <button role="tab" aria-selected="false" data-tab="ia">Análisis IA</button>
+        <button role="tab" aria-selected="false" data-tab="th">Umbrales</button>
+        <button role="tab" aria-selected="false" data-tab="fx">Fallas, OTA y hardware</button>
+      </div>
+      <div class="panel" id="tab-serial" role="tabpanel"><pre class="serial" id="serial"></pre></div>
+      <div class="panel" id="tab-ia" role="tabpanel" hidden>
+        <div class="manual" style="justify-content:space-between;flex-wrap:wrap">
+          <span class="d">La IA analiza cada hora simulada. También puedes pedir un análisis ahora.</span>
+          <button class="btn" id="airun">Ejecutar análisis ahora</button>
+        </div>
+        <div class="ailog" id="ailog" style="margin-top:10px"></div>
+      </div>
+      <div class="panel" id="tab-th" role="tabpanel" hidden>
+        <div class="form">
+          <div class="field"><label for="th-t">Objetivo temp. (°C)</label><input id="th-t" type="number" min="18" max="30" step="0.5"></div>
+          <div class="field"><label for="th-sl">Inicio de riego (suelo %)</label><input id="th-sl" type="number" min="20" max="70" step="1"></div>
+          <div class="field"><label for="th-sh">Corte de riego (suelo %)</label><input id="th-sh" type="number" min="30" max="85" step="1"></div>
+          <div class="field"><label for="th-rh">HR máx. del aire (%)</label><input id="th-rh" type="number" min="50" max="95" step="1"></div>
+        </div>
+        <p class="d" id="thmsg" style="margin:10px 0 0">El ventilador se enciende a objetivo + 1,0 °C y se apaga a objetivo + 0,5 °C. Los cambios se guardan en la EEPROM.</p>
+      </div>
+      <div class="panel" id="tab-fx" role="tabpanel" hidden>
+        <p class="sub2">Inyección de fallas</p>
+        <div class="rows">
+          <div class="row"><div><div>DHT22 desconectado</div><div class="d">Timeout en el bus de un hilo; el ventilador pasa a modo a prueba de fallos.</div></div><button class="sw danger" id="f-dht" role="switch" aria-checked="false" aria-label="Falla DHT22"></button></div>
+          <div class="row"><div><div>Cable del sensor de suelo suelto</div><div class="d">A0 queda flotante (ADC ≈ 1000); el firmware descarta la lectura y bloquea el riego.</div></div><button class="sw danger" id="f-soil" role="switch" aria-checked="false" aria-label="Falla sensor de suelo"></button></div>
+          <div class="row"><div><div>Relé de bomba pegado</div><div class="d">Contactos soldados: la bomba queda energizada aunque D7 esté en HIGH.</div></div><button class="sw danger" id="f-relay" role="switch" aria-checked="false" aria-label="Falla relé"></button></div>
+          <div class="row"><div><div>Batería degradada</div><div class="d">La capacidad efectiva cae de 84 Wh a 42 Wh.</div></div><button class="sw danger" id="f-batt" role="switch" aria-checked="false" aria-label="Falla batería"></button></div>
+        </div>
+        <p class="sub2">Actualización por aire (OTA)</p>
+        <div class="row" style="border-top:0">
+          <div><div id="otat">Firmware 1.4.1 · disponible 1.5.0</div><div class="bar" style="margin:6px 0"><i id="otabar" style="background:var(--water)"></i></div><div class="d" id="wifi"></div></div>
+          <button class="btn" id="ota">Instalar 1.5.0</button>
+        </div>
+        <p class="sub2">Mapa de pines</p>
+        <dl class="pins">
+          <dt>D2</dt><dd>DHT22 (temperatura y humedad del aire)</dd>
+          <dt>A0</dt><dd>Sensor capacitivo de humedad de suelo v1.2</dd>
+          <dt>D5</dt><dd>PWM de las luces LED (MOSFET, rama de 12 V)</dd>
+          <dt>D6</dt><dd>Ventilador 5 V (MOSFET, rama del LM2596)</dd>
+          <dt>D7</dt><dd>Módulo de relé de la bomba (activo en bajo)</dd>
+          <dt>D8</dt><dd>Interruptor AUTO/MANUAL (INPUT_PULLUP)</dd>
+          <dt>D10/11</dt><dd>ESP8266 por SoftwareSerial a 9600 baud</dd>
+          <dt>A4/A5</dt><dd>Pantalla por I²C</dd>
+        </dl>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+'use strict';
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const f1=v=>v.toFixed(1).replace('.',',');
+const f2=v=>v.toFixed(2).replace('.',',');
+const fmt=t=>{t=((Math.floor(t)%1440)+1440)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');};
+const stamp=a=>`D${Math.floor(a/1440)+1} ${fmt(a)}`;
+const fmtH=h=>h<1?`${Math.max(1,Math.round(h*60))} min`:`${f1(h)} h`;
+const RATE=26.75; // L per US$ (assumption, Oct 2026)
+const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const LS={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+function hex(c){c=c.replace('#','');return [0,2,4].map(i=>parseInt(c.slice(i,i+2),16));}
+function mix(a,b,t){t=clamp(t,0,1);const A=hex(a),B=hex(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+const ease=(cur,target,rate,dt)=>cur+(target-cur)*Math.min(1,rate*dt);
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+const money=u=>u.toLocaleString('es-HN',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* =====================================================================
+   State
+   ===================================================================== */
+const WX={
+  despejado:{f:1,rh:58,dt:0,n:'Despejado'},
+  parcial:{f:.55,rh:66,dt:-1,n:'Nubosidad parcial'},
+  nublado:{f:.18,rh:76,dt:-2.5,n:'Nublado'},
+  lluvia:{f:.08,rh:90,dt:-4,n:'Lluvia'}
+};
+function defaults(){return{
+  abs:720, weather:'despejado', heat:false,
+  battWh:84*.78, res:1650,
+  T:26.4, RH:68, soil:47, pending:0,
+  led:80, pump:false, fan:true, pumpCmd:false, queue:0, dry:false, cyc:0,
+  mode:'AUTO', ai:true, man:{led:80,pump:false,fan:true},
+  th:{tTarget:25, soilLow:45, soilHigh:60, rhMax:80},
+  faults:{dht:false,soil:false,relay:false,batt:false},
+  fw:'1.4.1', otaBusy:false, otaP:0,
+  lvd:false, float:false,
+  solarW:17.2, loadW:9.9, netW:5.9, etRate:.75,
+  adc:460, soilRead:47, tRead:26.4, rhRead:68,
+  ledReason:'', lastReasonLog:-999, aiPre:false,
+  protLogged:false, dryLogged:false, fullLogged:false,
+  water:[], hist:[], log:[], ailog:[], logV:0, aiV:0,
+  running:true, speed:5, acc:0
+};}
+let S=defaults();
+const TH_LIM={tTarget:[18,30],soilLow:[20,70],soilHigh:[30,85],rhMax:[50,95]};
+function thValid(o){return !!o&&Object.keys(TH_LIM).every(k=>typeof o[k]==='number'&&o[k]>=TH_LIM[k][0]&&o[k]<=TH_LIM[k][1])&&o.soilHigh>=o.soilLow+5;}
+function loadTh(){try{const o=JSON.parse(LS.get('cafe01.th')||'null');if(thValid(o))S.th={tTarget:o.tTarget,soilLow:o.soilLow,soilHigh:o.soilHigh,rhMax:o.rhMax};}catch(e){}}
+let lastPulseAt=-1e9; // real-time ms of the last irrigation pulse (for visuals)
+let dirty=true;
+
+const cap=()=>S.faults.batt?42:84;
+const socNow=()=>S.battWh/cap()*100;
+function sun(t){const x=(t-360)/720;return (x>0&&x<1)?Math.sin(Math.PI*x):0;}
+function ambient(t){return 21.5+4.5*Math.cos(2*Math.PI*(t-840)/1440)+WX[S.weather].dt+(S.heat?6:0);}
+function log(msg,l='i'){S.log.unshift({abs:S.abs,msg,l});if(S.log.length>250)S.log.pop();S.logV++;dirty=true;}
+
+/* =====================================================================
+   Control logic (firmware)
+   ===================================================================== */
+function autoLed(t,s){
+  let base=0;
+  if(t>=360&&t<1080){base=80;if(t<420)base=80*(t-360)/60;else if(t>=1020)base=80*(1080-t)/60;}
+  let v=base,r='';
+  if(base>0){
+    if(S.ai){
+      if(S.tRead!=null&&S.tRead>S.th.tTarget+1){v-=Math.min(30,(S.tRead-S.th.tTarget-1)*15);r='atenuación térmica';}
+      if((S.weather==='nublado'||S.weather==='lluvia')&&s<60&&v>60){v=60;r='ahorro por baja generación solar';}
+      if(s<35&&v>45){v=45;r='gestión de carga (batería < 35 %)';}
+      if(s<20&&v>20){v=20;r='deslastre de carga (batería < 20 %)';}
+    }else if(s<15){v=0;r='corte por batería baja (regla fija)';}
+  }
+  if(r!==S.ledReason){
+    if(S.abs-S.lastReasonLog>=20){
+      if(r)log(`${S.ai?'IA':'Regla'}: LED limitado por ${r}.`,'a');
+      else if(S.ledReason)log('LED vuelve al perfil base de fotoperiodo.','i');
+      S.lastReasonLog=S.abs;
+    }
+    S.ledReason=r;
+  }
+  return Math.round(clamp(v,0,100));
+}
+function autoFan(){
+  if(S.tRead==null)return true; // fail-safe
+  if(S.tRead>S.th.tTarget+1||S.rhRead>S.th.rhMax)return true;
+  if(S.tRead<S.th.tTarget+.5&&S.rhRead<S.th.rhMax-5)return false;
+  return S.fan;
+}
+function autoPump(t){
+  S.aiPre=false;
+  if(S.soilRead==null)return false;
+  if(S.pumpCmd)return S.soilRead<S.th.soilHigh;
+  if(S.soilRead<S.th.soilLow)return true;
+  if(S.ai&&t>=330&&t<=480&&S.soilRead<S.th.soilLow+4&&S.res>400){S.aiPre=true;return true;}
+  return false;
+}
+
+/* =====================================================================
+   Physics: one simulation step = 1 simulated minute
+   ===================================================================== */
+function step(){
+  S.abs++;
+  const t=S.abs%1440, w=WX[S.weather], sf=sun(t), c=cap();
+  const s=S.battWh/c*100;
+  if(!S.lvd&&s<=8){S.lvd=true;log('Regulador PWM: desconexión por baja tensión (LVD ≈ 11,1 V). Todas las cargas sin energía.','c');}
+  else if(S.lvd&&s>=15){S.lvd=false;log('Regulador PWM: reconexión de cargas. Arduino reinicia y ejecuta setup().','o');}
+
+  // Sensors
+  if(S.lvd){S.adc=null;S.soilRead=null;S.tRead=null;S.rhRead=null;}
+  else{
+    const noise=S.fw==='1.5.0'?1:4;
+    S.adc=S.faults.soil?990+Math.floor(Math.random()*33):Math.round(clamp(620-S.soil*3.4+(Math.random()-.5)*noise,0,1023));
+    S.soilRead=S.adc>700?null:clamp((620-S.adc)/3.4,0,100);
+    S.tRead=S.faults.dht?null:S.T+(Math.random()-.5)*.1;
+    S.rhRead=S.faults.dht?null:clamp(S.RH+(Math.random()-.5)*.4,0,100);
+  }
+
+  // Control
+  let led=0,fan=false,pumpCmd=false;
+  if(!S.lvd){
+    if(S.mode==='AUTO'){led=autoLed(t,s);fan=autoFan();pumpCmd=autoPump(t);}
+    else{led=S.man.led;fan=S.man.fan;pumpCmd=S.man.pump;}
+  }
+  // AUTO irrigation in cycles: 1 min of pulses + 4 min infiltration pause
+  let cycOn=true;
+  if(pumpCmd&&S.mode==='AUTO'){cycOn=(S.cyc%5)===0;S.cyc++;}else S.cyc=0;
+  let want=(pumpCmd&&cycOn)||S.queue>0;
+  if((pumpCmd||S.queue>0)&&!S.lvd&&S.res<50){
+    if(!S.protLogged){log('Protección contra marcha en seco: reservorio estimado < 50 mL. Bomba inhibida.','w');S.protLogged=true;}
+    want=false;pumpCmd=false;S.queue=0;if(S.mode==='MANUAL')S.man.pump=false;
+  }
+  if(S.res>=50)S.protLogged=false;
+  const prevCmd=S.pumpCmd;
+  S.pumpCmd=pumpCmd;
+  let pumpOn=want;
+  if(S.faults.relay)pumpOn=true;
+  if(S.lvd)pumpOn=false;
+
+  let pulses=0,dry=false;
+  if(pumpOn){
+    for(let i=0;i<4;i++){if(S.res>=25){S.res-=25;S.pending+=25;pulses++;}else dry=true;}
+    if(S.queue>0)S.queue=Math.max(0,S.queue-4);
+    if(pulses){S.water.push({abs:S.abs,ml:pulses*25});lastPulseAt=performance.now();}
+  }
+  if(dry&&!S.dryLogged){log('ALERTA: bomba energizada sin agua (marcha en seco). Riesgo de daño al impulsor.','c');S.dryLogged=true;}
+  if(!dry)S.dryLogged=false;
+
+  // Soil
+  const inf=S.pending*.5;S.pending-=inf;S.soil+=inf*.045;
+  const et=.0065*(1+.07*(S.T-20))*(1+led/250)*(fan?1.1:1)*(1+(60-S.RH)/120);
+  S.etRate=Math.max(0,et*60);
+  S.soil-=Math.max(0,et);
+  if(S.soil>75)S.soil-=(S.soil-75)*.02;
+  S.soil=clamp(S.soil,5,95);
+  // Air
+  const amb=ambient(t);
+  const heat=led/100*(fan?.8:2.2);
+  S.T+=(amb+heat-S.T)*(fan?.06:.025)+(Math.random()-.5)*.03;
+  const rhT=w.rh-(S.T-22)*1.5+(S.soil-50)*.08+(pulses?2:0);
+  S.RH=clamp(S.RH+(rhT-S.RH)*(fan?.05:.02)+(Math.random()-.5)*.2,20,99);
+  // Rain
+  if(S.weather==='lluvia'){
+    S.res=Math.min(2000,S.res+6);
+    if(S.res>=2000&&!S.fullLogged){log('Reservorio lleno: el excedente sale por el aliviadero.','o');S.fullLogged=true;}
+  }
+  if(S.res<1990)S.fullLogged=false;
+
+  // Energy
+  const relayW=(want&&!S.lvd)?.36:0;
+  const v5=S.lvd?0:(.75+(fan?1:0)+relayW);
+  const load=v5/.88+10*led/100+(pumpOn?3.6*.2:0);
+  let solar=20*.85*sf*w.f*(.97+Math.random()*.06);
+  let net=solar*.92-load;
+  if(S.battWh>=c-.01&&net>0){solar=load/.92;net=0;S.float=true;}else S.float=false;
+  S.battWh=clamp(S.battWh+net/60,0,c);
+  S.solarW=solar;S.loadW=load;S.netW=net;
+
+  // Transition log
+  const sr=S.soilRead==null?'—':f1(S.soilRead)+' %';
+  if(pumpCmd!==prevCmd){
+    if(pumpCmd){
+      if(S.mode==='MANUAL')log('MANUAL: bomba ON (relé D7 = LOW, pulsos de 3 s cada 15 s)','i');
+      else if(S.aiPre)log(`IA: riego preventivo matutino · suelo ${sr} (evita regar en las horas de más calor)`,'a');
+      else log(`Ciclo de riego iniciado · suelo ${sr} < ${S.th.soilLow} % · 1 min de pulsos + 4 min de infiltración`,'i');
+    }else if(!S.lvd)log(`${S.mode==='MANUAL'?'MANUAL: bomba OFF':'Ciclo de riego terminado'} (D7 = HIGH) · suelo ${sr}`,'i');
+  }
+  if(pumpOn&&!want&&!S.pump)log('Bomba energizada SIN comando: D7 en HIGH pero el circuito sigue cerrado.','c');
+  if(fan!==S.fan)log(`Ventilador ${fan?'ON':'OFF'} (D6) · T ${S.tRead==null?'ERR':f1(S.tRead)+' °C'} · HR ${S.rhRead==null?'ERR':Math.round(S.rhRead)+' %'}`,'i');
+  if((led>0)!==(S.led>0))log(led>0?`LED ON · PWM D5 = ${Math.round(led*2.55)}/255`:'LED OFF','i');
+  if(t===360)log('Amanecer simulado: inicia el fotoperiodo de 12 h (rampa de 60 min).','o');
+  if(t===1080)log('Atardecer simulado: fin del fotoperiodo.','o');
+  S.led=led;S.fan=fan;S.pump=pumpOn;S.dry=dry;
+
+  if(S.abs%5===0){
+    S.hist.push({abs:S.abs,T:S.T,soil:S.soil,soc:S.battWh/c*100,pv:S.solarW});
+    while(S.hist.length&&S.hist[0].abs<S.abs-1440)S.hist.shift();
+  }
+  while(S.water.length&&S.water[0].abs<S.abs-1440)S.water.shift();
+  if(S.ai&&!S.lvd&&t%60===0)runAI(false);
+  dirty=true;
+}
+
+/* =====================================================================
+   AI analysis
+   ===================================================================== */
+function runAI(manual){
+  const t=S.abs%1440,c=cap(),s=S.battWh/c*100,w=WX[S.weather],day=t>=360&&t<1080;
+  const L=[];
+  if(S.mode==='MANUAL')L.push(['w','Modo MANUAL: el lazo automático está suspendido; la IA solo observa y recomienda.']);
+  if(S.soilRead==null)L.push(['c','Sensor de suelo sin lectura válida (ADC fuera de rango). Riego automático bloqueado por seguridad. Revisar el conector JST del sensor.']);
+  else{
+    const hrs=(S.soilRead-S.th.soilLow)/Math.max(S.etRate,.01);
+    L.push(['i',`Suelo en ${f1(S.soilRead)} %, se seca a ≈ ${f2(S.etRate)} %/h. `+(S.soilRead<S.th.soilLow?'Está bajo el umbral: riego en curso o pendiente.':`Próximo riego estimado en ${fmtH(hrs)}.`)]);
+  }
+  const used=S.water.filter(x=>x.abs>S.abs-1440).reduce((a,b)=>a+b.ml,0);
+  const est=Math.max(used,S.etRate*24/.045);
+  const days=S.res/Math.max(est,1);
+  L.push([days<1.5?'w':'i',`Reservorio con ${Math.round(S.res)} mL. Riego en 24 h: ${used} mL; demanda estimada ${Math.round(est)} mL/día. Autonomía ≈ ${f1(days)} días`+(days<1.5?'. Conviene recargarlo o esperar lluvia.':'.')]);
+  const minsToDawn=t<360?360-t:1440-t+360;
+  const minsLed=day?1080-t:0;
+  let pvIn=0;for(let m=t;m<(day?1080:t);m++)pvIn+=20*.85*sun(m)*w.f*.92/60;
+  const eOut=(.85*minsToDawn+(S.led/10)*minsLed+(S.fan?1.14:0)*Math.min(minsToDawn,Math.max(minsLed,120)))/60;
+  const proj=clamp(S.battWh+pvIn-eOut,0,c)/c*100;
+  L.push([proj<25?'w':'i',`Batería ${Math.round(s)} % (${f1(S.battWh)} Wh). Si el cielo sigue ${w.n.toLowerCase()}, quedan ≈ ${Math.round(pvIn)} Wh solares hoy; SOC proyectado al amanecer ≈ ${Math.round(proj)} %.`+(proj<25?' Recomiendo bajar la intensidad del LED o acortar el fotoperiodo.':'')]);
+  if(S.tRead==null)L.push(['c','DHT22 sin respuesta. Ventilador forzado a ON como medida a prueba de fallos.']);
+  else{
+    if(day&&S.tRead>S.th.tTarget+1)L.push(['w',`Temperatura ${f1(S.tRead)} °C, ${f1(S.tRead-S.th.tTarget)} °C sobre el objetivo. Ventilador activo`+(S.ai&&S.ledReason==='atenuación térmica'?' y LED atenuado para reducir el calor.':'.')+(ambient(t)>S.th.tTarget?` El exterior está a ${f1(ambient(t))} °C, así que ventilar no basta para alcanzar el objetivo.`:'')]);
+    else if(!day)L.push(['o',`Noche a ${f1(S.tRead)} °C. El enfriamiento nocturno favorece la floración del arábica; no hace falta ventilar.`]);
+    else L.push(['o',`Temperatura ${f1(S.tRead)} °C, dentro de la banda de control.`]);
+    if(S.th.tTarget>24&&(manual||t%360===0))L.push(['a','Nota agronómica: para Coffea arabica el rango diurno favorable suele estar entre 18 y 24 °C. Un objetivo de 23–24 °C reduciría el estrés térmico.']);
+    if(S.rhRead>85)L.push(['w',`Humedad del aire en ${Math.round(S.rhRead)} %: sube el riesgo de roya y otros hongos. Mantener la ventilación.`]);
+    else if(S.rhRead<45)L.push(['w',`Humedad del aire en ${Math.round(S.rhRead)} %: riesgo de estrés hídrico en la hoja.`]);
+  }
+  if(S.faults.relay&&!S.pumpCmd&&S.queue===0)L.push(['c','Anomalía: el reservorio baja sin comando de riego. Probable relé con contactos soldados. Desconectar la bomba y cambiar el módulo de relé.']);
+  if(S.faults.batt)L.push(['w','Capacidad efectiva de la batería reducida a ≈ 42 Wh: la autonomía nocturna se reduce a la mitad.']);
+  S.ailog.unshift({abs:S.abs,manual,lines:L});if(S.ailog.length>40)S.ailog.pop();S.aiV++;dirty=true;
+}
+
+/* =====================================================================
+   Actions (shared by dashboard, model popovers and scenarios)
+   ===================================================================== */
+function setMode(m){
+  if(m===S.mode)return;
+  S.mode=m;
+  if(m==='MANUAL'){S.man={led:S.led,pump:false,fan:S.fan};log('Interruptor físico → MANUAL (D8 = LOW). Transferencia sin saltos: se conservan LED y ventilador; bomba en OFF.','w');}
+  else{S.man.pump=false;S.pumpCmd=false;log('Interruptor físico → AUTO (D8 = HIGH). El lazo de umbrales retoma el control.','o');}
+  dirty=true;
+}
+function setAI(v){
+  if(v===S.ai)return;
+  S.ai=v;log(v?'App: control climático IA ENCENDIDO. Perfil adaptativo de LED y riego preventivo activos.':'App: control climático IA APAGADO. Solo reglas de umbral fijas.','a');
+  if(v&&!S.lvd)runAI(true);
+}
+function applyManual(){if(S.mode==='MANUAL'&&!S.lvd){S.led=S.man.led;S.fan=S.man.fan;}dirty=true;}
+function setManLed(v){S.man.led=clamp(Math.round(v),0,100);applyManual();}
+function toggleManPump(){if(S.mode!=='MANUAL')return;S.man.pump=!S.man.pump;dirty=true;}
+function toggleManFan(){if(S.mode!=='MANUAL')return;S.man.fan=!S.man.fan;applyManual();}
+function shot(){if(S.lvd||S.res<50)return;S.queue+=4;log('App: riego puntual solicitado (4 pulsos ≈ 100 mL).','a');}
+const WXMSG={despejado:'Clima: cielo despejado. Generación solar plena.',parcial:'Clima: nubosidad parcial. La generación cae ≈ 45 %.',nublado:'Clima: cielo cubierto. La generación cae ≈ 80 %.',lluvia:'Clima: lluvia. El colector recarga el reservorio; la generación solar es mínima.'};
+function setWeather(w){if(w===S.weather)return;S.weather=w;log(WXMSG[w],'w');}
+function toggleHeat(){S.heat=!S.heat;log(S.heat?'Clima: ola de calor (+6 °C en el ambiente exterior).':'Clima: termina la ola de calor.','w');}
+const FMSG={
+  dht:['Falla inyectada: DHT22 desconectado (timeout, lectura NaN). Ventilador a prueba de fallos.','DHT22 reconectado: lecturas válidas.'],
+  soil:['Falla inyectada: cable de señal del sensor de suelo suelto (A0 flotante ≈ 1000). Riego AUTO bloqueado.','Sensor de suelo reconectado.'],
+  relay:['Falla inyectada: contactos del relé de la bomba soldados.','Módulo de relé sustituido. D7 vuelve a controlar la bomba.'],
+  batt:['Falla inyectada: batería degradada, capacidad efectiva 42 Wh.','Batería nueva instalada (84 Wh).']
+};
+function toggleFault(k){
+  S.faults[k]=!S.faults[k];
+  if(k==='batt')S.battWh=S.faults.batt?S.battWh*.5:S.battWh*2;
+  log(FMSG[k][S.faults[k]?0:1],S.faults[k]?'c':'o');
+  if(!S.lvd&&(k==='dht'||k==='soil')){S.tRead=S.faults.dht?null:S.T;S.rhRead=S.faults.dht?null:S.RH;if(S.faults.soil){S.adc=1003;S.soilRead=null;}else{S.adc=Math.round(620-S.soil*3.4);S.soilRead=S.soil;}}
+  if(S.faults.relay&&k==='relay')runAI(true);
+  dirty=true;
+}
+function refill(){S.res=2000;log('Operador: reservorio rellenado a mano (2000 mL).','o');}
+function ota(){
+  if(S.otaBusy||S.fw==='1.5.0'||S.lvd)return;
+  if(socNow()<25){log('OTA rechazada: batería < 25 %. Un corte durante la escritura en flash podría dejar el equipo inservible.','w');return;}
+  S.otaBusy=true;S.otaP=0;log('OTA: descargando firmware v1.5.0 (312 KB) por Wi-Fi…','a');
+  const iv=setInterval(()=>{
+    S.otaP+=10+Math.random()*12;
+    if(S.otaP>=100){
+      clearInterval(iv);S.otaP=100;S.otaBusy=false;S.fw='1.5.0';
+      log('OTA: MD5 verificado, imagen escrita. ESP8266 reiniciado; el Arduino mantuvo el lazo de control.','o');
+      log('Cambios en v1.5.0: filtro de mediana en el ADC de suelo (menos ruido) y registro de pulsos en EEPROM.','i');
+    }
+    dirty=true;
+  },500);
+}
+function adv(n){for(let i=0;i<n;i++)step();dirty=true;}
+
+/* Scenarios: always jump forward in time so the 24 h history stays ordered */
+function jumpTo(min){const d=S.abs-(((S.abs%1440)+1440)%1440);let tg=d+min;if(tg<=S.abs)tg+=1440;S.abs=tg;S.acc=0;}
+const SCEN={
+  hot:{n:'Mediodía caluroso',f(){jumpTo(720);setWeather('despejado');if(!S.heat)toggleHeat();setMode('AUTO');setAI(true);}},
+  storm:{n:'Tormenta',f(){jumpTo(900);if(S.heat)toggleHeat();setWeather('lluvia');S.res=Math.min(S.res,900);}},
+  dry:{n:'Semana seca',f(){jumpTo(600);if(S.heat)toggleHeat();setWeather('despejado');setMode('AUTO');S.soil=31;S.res=260;S.pumpCmd=false;S.cyc=0;S.queue=0;S.speed=Math.max(S.speed,5);}},
+  night:{n:'Noche nublada con batería baja',f(){jumpTo(1200);if(S.heat)toggleHeat();setWeather('nublado');S.battWh=cap()*.115;S.speed=Math.max(S.speed,15);}},
+  reset:{n:'Reset',f(){const sp=S.speed;S=defaults();S.speed=sp;loadTh();lastPulseAt=-1e9;boot();}}
+};
+function runScenario(k){
+  const sc=SCEN[k];if(!sc)return;
+  sc.f();
+  snapV();
+  if(k!=='reset')log(`Escenario: ${sc.n} · ${stamp(S.abs)}`,'w');
+  syncTh();dirty=true;
+}
+
+/* =====================================================================
+   Component catalogue (model ↔ dashboard links, info panel content)
+   ===================================================================== */
+const isDayT=()=>{const t=S.abs%1440;return t>=360&&t<1080;};
+const A={
+  mode:{t:'btn',l:()=>S.mode==='AUTO'?'Cambiar a MANUAL (interruptor)':'Cambiar a AUTO (interruptor)',f:()=>setMode(S.mode==='AUTO'?'MANUAL':'AUTO')},
+  shot:{t:'btn',l:()=>'Riego puntual · 4 pulsos (100 mL)',f:shot,d:()=>S.lvd||S.res<50},
+  ai:{t:'sw',l:'Control climático IA',c:()=>S.ai,f:()=>setAI(!S.ai)},
+  fault:(k,l)=>({t:'sw',danger:true,l,c:()=>S.faults[k],f:()=>toggleFault(k)}),
+  wx:{t:'wx'},
+  ledR:{t:'range',l:'Intensidad manual',v:()=>S.man.led,f:v=>setManLed(v),d:()=>S.mode!=='MANUAL'||S.lvd},
+  fanS:{t:'sw',l:'Ventilador (manual)',c:()=>S.man.fan,f:toggleManFan,d:()=>S.mode!=='MANUAL'||S.lvd},
+  pumpS:{t:'sw',l:'Bomba (manual)',c:()=>S.man.pump,f:toggleManPump,d:()=>S.mode!=='MANUAL'||S.lvd},
+  refill:{t:'btn',l:()=>'Rellenar reservorio a mano (2000 mL)',f:refill,d:()=>S.res>=1995},
+  ota:{t:'btn',l:()=>S.fw==='1.5.0'?'Firmware 1.5.0 al día':S.otaBusy?`OTA ${Math.round(S.otaP)} %`:'Instalar firmware 1.5.0 (OTA)',f:ota,d:()=>S.otaBusy||S.fw==='1.5.0'||S.lvd},
+  aiRun:{t:'btn',l:()=>'Ejecutar análisis IA ahora',f:()=>{if(S.ai&&!S.lvd)runAI(true);},d:()=>!S.ai||S.lvd}
+};
+function tempStatus(){
+  if(S.tRead==null)return ['crit','Sin lectura'];
+  const d=S.tRead-S.th.tTarget;
+  if(d>4)return ['crit','Muy alta'];if(d>1)return ['warn','Alta'];if(d<-3)return [isDayT()?'warn':'info',isDayT()?'Baja':'Nocturna'];return ['ok','En rango'];
+}
+const COMP={
+  sky:{n:'Cielo y clima exterior',ic:'🌤️',card:'card-res',pin:'—',fn:'Define la radiación solar, la temperatura exterior y la lluvia que llena el reservorio.',spec:'Generación relativa: despejado 100 % · parcial 55 % · nublado 18 % · lluvia 8 %. La ola de calor suma +6 °C al exterior.',usd:null,note:'no aplica',
+    live:()=>[['Clima',WX[S.weather].n+(S.heat?' + ola de calor':'')],['Exterior',f1(ambient(S.abs%1440))+' °C'],['Hora',fmt(S.abs%1440)+(isDayT()?' (día)':' (noche)')]],
+    st:()=>S.weather==='lluvia'?['info','Lluvia']:S.heat?['crit','Ola de calor']:['ok',WX[S.weather].n],act:[A.wx]},
+  panel:{n:'Panel solar 20 W',ic:'☀️',card:'card-energy',pin:'— (entrada PV del regulador)',fn:'Convierte la luz solar en energía para cargar la batería de 12 V.',spec:'12 V · 20 W · Voc ≈ 21,6 V · rendimiento del modelo 85 %.',usd:40,note:'kit ECO-WORTHY con regulador PWM',
+    live:()=>[['Generación',f1(S.solarW)+' W'],['Clima',WX[S.weather].n],['Sol',isDayT()?'Sí':'Noche']],
+    st:()=>S.solarW>.3?['ok','Generando']:['mute','Sin generación'],act:[A.wx]},
+  enclosure:{n:'Caja de acrílico 12×12×18"',ic:'📦',card:'card-env',pin:'—',fn:'Crea el microclima controlado alrededor de la planta.',spec:'Acrílico transparente, puertas magnéticas y ventilación lateral/superior.',usd:45,
+    live:()=>[['Temp. interior',S.tRead==null?'ERR':f1(S.tRead)+' °C'],['HR interior',S.rhRead==null?'ERR':Math.round(S.rhRead)+' %'],['Exterior',f1(ambient(S.abs%1440))+' °C']],
+    st:tempStatus,act:[]},
+  plant:{n:'Planta de café (Coffea arabica)',ic:'☕',card:'card-env',pin:'—',fn:'Cultivo objetivo del prototipo; su aspecto refleja el estado hídrico y térmico.',spec:'Rango diurno favorable 18–24 °C · riesgo de roya con HR > 85 % · no tolera encharcamiento.',usd:null,note:'comprar en vivero local',
+    live:()=>[['Salud',plantState()[1]],['Suelo',Math.round(S.soil)+' %'],['Temp.',f1(S.T)+' °C']],
+    st:plantState,act:[A.shot]},
+  led:{n:'Luz LED de cultivo (espectro completo)',ic:'💡',card:'card-act',pin:'D5 · PWM vía MOSFET (rama 12 V)',fn:'Simula la luz solar: fotoperiodo de 12 h (06:00–18:00) con rampas de 60 min.',spec:'12 V · 10 W máx. · intensidad base 80 %.',usd:30,
+    live:()=>[['Intensidad',S.led+' %'],['Potencia',f1(10*S.led/100)+' W'],['PWM D5',Math.round(S.led*2.55)+'/255'],['Motivo',S.mode==='MANUAL'?'Manual':(S.ledReason||(isDayT()?'Perfil base':'Fuera de fotoperiodo'))]],
+    st:()=>S.lvd?['crit','Sin energía']:S.led>0?['ok','ON · '+S.led+' %']:['mute','OFF'],act:[A.ledR,A.mode]},
+  fan:{n:'Ventilador 5 V CC (60 mm)',ic:'🌀',card:'card-act',pin:'D6 · MOSFET (rama 5 V del LM2596)',fn:'Extrae el aire caliente y húmedo de la caja.',spec:'5 V · 0,2 A · 60×60×15 mm · ON a objetivo + 1,0 °C, OFF a objetivo + 0,5 °C, también ON con HR > máx.',usd:8,
+    live:()=>[['Estado',S.fan?'ON':'OFF'],['Temp.',S.tRead==null?'ERR':f1(S.tRead)+' °C'],['HR',S.rhRead==null?'ERR':Math.round(S.rhRead)+' %'],['Objetivo',f1(S.th.tTarget)+' °C']],
+    st:()=>S.lvd?['crit','Sin energía']:S.fan?['ok',S.tRead==null&&S.mode==='AUTO'?'ON · a prueba de fallos':'ON · girando']:['mute','OFF'],act:[A.fanS,A.mode]},
+  dht:{n:'Sensor DHT22 (AM2302)',ic:'🌡️',card:'card-env',pin:'D2 · bus de un hilo',fn:'Mide la temperatura y la humedad del aire dentro de la caja.',spec:'−40 a 80 °C (±0,5 °C) · 0–100 % HR (±2 %).',usd:9,
+    live:()=>[['Temperatura',S.tRead==null?'ERR':f1(S.tRead)+' °C'],['Humedad',S.rhRead==null?'ERR':Math.round(S.rhRead)+' %']],
+    st:()=>S.faults.dht?['crit','Desconectado']:S.lvd?['crit','Sin energía']:['ok','Leyendo'],act:[A.fault('dht','Desconectar DHT22 (falla)')]},
+  soil:{n:'Sensor capacitivo de humedad v1.2',ic:'🌱',card:'card-env',pin:'A0 · analógico',fn:'Mide la humedad del suelo para decidir cuándo regar.',spec:'Calibración: seco 620 · saturado 280 · lectura inválida > 700.',usd:10,note:'paquete de 5 sensores',
+    live:()=>[['Humedad suelo',S.soilRead==null?'ERR':f1(S.soilRead)+' %'],['ADC A0',S.adc==null?'—':String(S.adc)],['Umbrales',`${S.th.soilLow} % → ${S.th.soilHigh} %`]],
+    st:()=>S.faults.soil?['crit','Cable suelto']:S.soilRead==null?['crit','Sin lectura']:S.soilRead<S.th.soilLow?['warn','Seco']:S.soilRead>S.th.soilHigh+8?['info','Saturado']:['ok','Óptimo'],act:[A.fault('soil','Soltar cable de señal (falla)')]},
+  drip:{n:'Anillo de goteo y emisores',ic:'💧',card:'card-act',pin:'—',fn:'Entrega el agua en pulsos cerca de las raíces.',spec:'Manguera 1/4" · 4 emisores · 25 mL por pulso · ciclos de 1 min de pulsos + 4 min de infiltración.',usd:25,
+    live:()=>[['Riego',S.pump?'Pulsando':S.pumpCmd?'Ciclo · pausa':'En reposo'],['Riego 24 h',usedWater()+' mL']],
+    st:()=>S.pump?['info','Regando']:['mute','En reposo'],act:[A.shot]},
+  pump:{n:'Bomba sumergible 12 V',ic:'⚙️',card:'card-act',pin:'D7 → relé CH1 (activo en bajo)',fn:'Impulsa el agua de lluvia del reservorio hacia el goteo.',spec:'12 V · 5 W · 280 L/h · pulsos 3 s ON / 12 s OFF · protección contra marcha en seco < 50 mL.',usd:12,
+    live:()=>[['Estado',S.dry?'EN SECO':S.pump?'ON · pulsos':S.pumpCmd?'Ciclo · pausa':'OFF'],['Cola manual',S.queue+' pulsos'],['Reservorio',Math.round(S.res)+' mL']],
+    st:()=>S.dry?['crit','En seco']:(S.faults.relay&&S.pump)?['crit','Sin comando']:S.pump?['ok','Bombeando']:['mute','OFF'],act:[A.pumpS,A.shot,A.mode]},
+  reservoir:{n:'Reservorio de agua de lluvia 2 L',ic:'🪣',card:'card-res',pin:'—',fn:'Almacena el agua de lluvia que recoge el embudo colector.',spec:'2000 mL · nivel estimado por conteo de pulsos · aliviadero de excedente.',usd:null,note:'recipiente reutilizado (local)',
+    live:()=>[['Nivel',Math.round(S.res)+' mL ('+Math.round(S.res/20)+' %)'],['Pulsos restantes','≈ '+Math.floor(S.res/25)],['Riego 24 h',usedWater()+' mL']],
+    st:()=>S.res<50?['crit','Vacío']:S.res<300?['warn','Bajo']:S.weather==='lluvia'&&S.res<2000?['info','Recargando']:['ok','OK'],act:[A.refill,A.wx]},
+  battery:{n:'Batería 12 V 7 Ah (AGM)',ic:'🔋',card:'card-energy',pin:'— (salida BAT del regulador)',fn:'Almacena la energía solar para la noche y los días nublados.',spec:'12 V · 7 Ah ≈ 84 Wh · LVD ≈ 8 % (11,1 V) · reconexión al 15 %.',usd:22,
+    live:()=>[['Carga',Math.round(socNow())+' %'],['Energía',f1(S.battWh)+' / '+cap()+' Wh'],['Tensión',f1(battV())+' V'],['Balance',(S.netW>=0?'+':'−')+f1(Math.abs(S.netW))+' W']],
+    st:()=>S.lvd?['crit','LVD']:socNow()<20?['crit','Baja']:socNow()<35?['warn','Media']:['ok','OK'],act:[A.fault('batt','Batería degradada (falla)')]},
+  controller:{n:'Regulador de carga PWM',ic:'🎛️',card:'card-energy',pin:'—',fn:'Carga la batería y desconecta las cargas por baja tensión (LVD).',spec:'12/24 V · 20 A · LVD al 8 %, reconexión al 15 %.',usd:null,note:'incluido en el kit solar',
+    live:()=>[['Modo',chgMode()],['Entrada PV',f1(S.solarW)+' W'],['Cargas',f1(S.loadW)+' W']],
+    st:()=>S.lvd?['crit','LVD activo']:['ok',chgMode()],act:[]},
+  buck:{n:'Convertidor LM2596 (12 → 5 V)',ic:'🔌',card:'card-energy',pin:'—',fn:'Alimenta el Arduino, los sensores, el ventilador y el relé con 5 V.',spec:'Entrada 4–40 V · salida 5,0 V · eficiencia ≈ 88 %.',usd:7,
+    live:()=>[['Salida','5,0 V'],['Carga 5 V',S.lvd?'0,0 W':f1(.75+(S.fan?1:0)+(S.pump?.36:0))+' W']],
+    st:()=>S.lvd?['crit','Sin energía']:['ok','Regulando'],act:[]},
+  arduino:{n:'Arduino Uno R3 (ELEGOO)',ic:'🧠',card:'card-display',pin:'ATmega328P · 16 MHz',fn:'Ejecuta la lógica de umbrales, lee los sensores y controla los actuadores.',spec:'32 KB flash · EEPROM con umbrales · lazo cada minuto simulado.',usd:30.62,note:'kit con cables y protoboards',
+    live:()=>[['Estado',S.lvd?'Sin energía':'Ejecutando loop()'],['Modo',S.mode],['IA',S.ai?'Encendida':'Apagada'],['Firmware',S.fw]],
+    st:()=>S.lvd?['crit','Apagado']:['ok','Corriendo'],act:[A.aiRun,A.mode]},
+  esp:{n:'Módulo Wi-Fi ESP8266 (ESP-01)',ic:'📶',card:'card-tabs',pin:'D10/D11 · SoftwareSerial 9600',fn:'Conecta con la app remota y recibe actualizaciones OTA.',spec:'3,3 V · 802.11 b/g/n · OTA rechazada con batería < 25 %.',usd:11,
+    live:()=>[['Wi-Fi',S.lvd?'Sin energía':'Conectado'],['Firmware',S.fw],['OTA',S.otaBusy?Math.round(S.otaP)+' %':'—']],
+    st:()=>S.lvd?['crit','Sin energía']:S.otaBusy?['info','Actualizando']:['ok','En línea'],act:[A.ota]},
+  hc05:{n:'Módulo Bluetooth HC-05',ic:'🔷',card:'card-display',pin:'UART (puerto serie)',fn:'Permite el control local desde un teléfono Android por Bluetooth.',spec:'Bluetooth 2.0 · 3,6–6 V · 9600 baud.',usd:9,
+    live:()=>[['Estado',S.lvd?'Sin energía':'Emparejado']],
+    st:()=>S.lvd?['crit','Sin energía']:['ok','Emparejado'],act:[A.ai]},
+  relay:{n:'Módulo de relés 4 canales',ic:'🔀',card:'card-act',pin:'D7 → CH1 (bomba), activo en bajo',fn:'Conmuta la bomba de 12 V desde la salida digital del Arduino.',spec:'5 V · optoacoplado · contactos 10 A @ 30 V CC.',usd:8,
+    live:()=>[['CH1 (bomba)',S.pump?'Cerrado':'Abierto'],['Comando D7',(S.pumpCmd||S.queue>0)?'LOW (ON)':'HIGH (OFF)']],
+    st:()=>S.faults.relay?['crit','Contactos pegados']:S.pump?['ok','CH1 activo']:['mute','En reposo'],act:[A.fault('relay','Relé pegado (falla)')]},
+  display:{n:'Pantalla integrada (I²C)',ic:'🖥️',card:'card-display',pin:'A4/A5 · I²C',fn:'Muestra las lecturas sin abrir la app.',spec:'Texto de 4 líneas, se apaga con LVD.',usd:11,note:'el presupuesto incluye una LCD1602 I2C',
+    live:()=>oledLines().map((l,i)=>['Línea '+(i+1),l||'—']),
+    st:()=>S.lvd?['crit','Apagada']:['ok','Encendida'],act:[A.ai]},
+  switch:{n:'Interruptor físico AUTO/MAN',ic:'🔘',card:'card-display',pin:'D8 · INPUT_PULLUP',fn:'Selecciona el control automático o manual; la transferencia es sin saltos.',spec:'SPST 12 V 20 A con tapa de seguridad.',usd:9,
+    live:()=>[['Modo',S.mode],['D8',S.mode==='AUTO'?'HIGH':'LOW']],
+    st:()=>S.mode==='AUTO'?['ok','AUTO']:['info','MANUAL'],act:[A.mode]}
+};
+function usedWater(){return S.water.filter(x=>x.abs>S.abs-1440).reduce((a,b)=>a+b.ml,0);}
+function battV(){const s=socNow();return S.lvd?11.1:clamp(11.75+1.05*s/100+(S.float?.8:S.netW>0?.25:-.05),10.8,13.8);}
+function chgMode(){return S.lvd?'LVD (cargas cortadas)':S.float?'Flotación':S.netW>.05?'Cargando':'Descargando';}
+function plantStress(){return Math.max(clamp((38-S.soil)/14,0,1),clamp((S.T-28.5)/4,0,1));}
+function plantState(){
+  const d=clamp((38-S.soil)/14,0,1),h=clamp((S.T-28.5)/4,0,1);
+  if(d>.15&&d>=h)return ['warn','Estrés hídrico'];
+  if(h>.15)return ['warn','Estrés térmico'];
+  return ['ok','Sana'];
+}
+function oledLines(){
+  if(S.lvd)return ['','','',''];
+  const s=socNow();
+  const tt=S.tRead==null?' ERR ':(S.tRead.toFixed(1)+'C');
+  const hh=S.rhRead==null?'ERR':(Math.round(S.rhRead)+'%');
+  const ss=S.soilRead==null?'ERR':(Math.round(S.soilRead)+'%');
+  return [`T:${tt}  HR:${hh}`,`SUELO:${ss.padEnd(4)} ${S.mode==='AUTO'?'AUTO':'MAN '}${S.ai?' IA':''}`,`BAT:${Math.round(s)}%  PV:${Math.round(S.solarW)}W`,`${S.pump?'BOMBA ':''}${S.fan?'VENT ':''}${S.led?'LED'+S.led:''}`];
+}
+
+/* =====================================================================
+   Model: build dynamic SVG pieces
+   ===================================================================== */
+const scene=$('scene');
+const comps={};
+scene.querySelectorAll('.comp').forEach(g=>{
+  const id=g.dataset.comp;(comps[id]=comps[id]||[]).push(g);
+  g.setAttribute('tabindex','0');g.setAttribute('role','button');
+  g.setAttribute('aria-label',(COMP[id]?COMP[id].n:id)+' — ver detalles');
+});
+// stars
+(function(){const g=$('stars');let seed=7;const r=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};for(let i=0;i<46;i++)el('circle',{cx:(r()*900).toFixed(1),cy:(r()*300).toFixed(1),r:(r()*1.3+.4).toFixed(2),opacity:(r()*.6+.4).toFixed(2)},g);})();
+// clouds
+const clouds=[];
+(function(){const g=$('clouds');const defs=[[0,70,1],[380,40,.8],[720,96,1.15]];defs.forEach(([x,y,s])=>{const c=el('g',{},g);[[0,0,34,18],[28,-10,30,20],[56,0,32,17],[26,8,44,14]].forEach(([cx,cy,rx,ry])=>el('ellipse',{cx:cx*s,cy:cy*s,rx:rx*s,ry:ry*s},c));clouds.push({g:c,x0:x,y,s});});})();
+// rain
+const rainDrops=[];
+(function(){const g=$('rain');let seed=3;const r=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};for(let i=0;i<80;i++){const x=r()*900,y=r()*520-40,sp=.75+r()*.5;rainDrops.push({e:el('line',{x1:x,y1:y,x2:x-3,y2:y+13},g),x,y,sp});}})();
+// LED diodes
+const ledD=[];for(let i=0;i<12;i++)ledD.push(el('rect',{x:324+i*16.5,y:156,width:9,height:6,rx:1.5,fill:'#3A3F44'},$('ledD')));
+// leaves
+const leaves=[];
+(function(){const g=$('leaves');const nodes=[[408,-1,.85],[398,1,.85],[384,-1,1],[372,1,1],[358,-1,1],[346,1,.95],[332,-1,.9],[320,1,.85],[306,-1,.75],[298,1,.7],[290,-1,.55],[290,1,.5]];
+  nodes.forEach(([y,dir,sz])=>{const x=420+(Math.sin(y/14)*1.5);const grp=el('g',{},g);el('path',{d:`M0 0 C ${10*sz} ${-11*sz}, ${32*sz} ${-11*sz}, ${44*sz} 0 C ${32*sz} ${9*sz}, ${10*sz} ${9*sz}, 0 0Z`},grp);el('path',{d:`M0 0 L ${42*sz} 0`,stroke:'#1E5428','stroke-width':'.8',fill:'none',opacity:'.6'},grp);leaves.push({g:grp,x,y,dir});});})();
+// drip drops
+const dropPts=[[362,436],[478,436],[395,441],[445,441]];
+const drops=dropPts.map(([x,y])=>el('ellipse',{cx:x,cy:y,rx:2,ry:3,opacity:0},$('drops')));
+// condensation
+(function(){const g=$('cond');let seed=11;const r=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};for(let i=0;i<55;i++){const x=284+r()*272,y=158+r()*334;el('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:(r()*2+1).toFixed(2),fill:'#FFFFFF','fill-opacity':'.7',stroke:'#8FB3C8','stroke-width':'.6'},g);}})();
+// sparks (fault indicators)
+function star(g,cx,cy){el('polygon',{points:Array.from({length:10},(_,i)=>{const a=Math.PI/5*i-Math.PI/2,r=i%2?5:12;return (cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1);}).join(' '),fill:'#FFD447',stroke:'#F04438','stroke-width':'1.5'},g);}
+star($('sparkDht'),254,330);star($('sparkSoil'),528,470);
+
+const M={sky0:$('sky0'),sky1:$('sky1'),gr0:$('gr0'),gr1:$('gr1'),stars:$('stars'),sun:$('sun'),moon:$('moon'),cloudsG:$('clouds'),rain:$('rain'),
+  shine:$('panelShine'),tint:$('encTint'),shimmer:$('shimmer'),cone:$('ledCone'),blades:$('fanBlades'),fanRing:$('fanRing'),fanAir:$('fanAir'),
+  soilTop:$('soilTop'),cracks:$('cracks'),cond:$('cond'),tubeFlow:$('tubeFlow'),pumpBody:$('pumpBody'),water:$('water'),overflow:$('overflow'),
+  battFill:$('battFill'),battTxt:$('battTxt'),battWarn:$('battWarn'),disp:$('dispTxt').querySelectorAll('tspan'),dispTxt:$('dispTxt'),swLever:$('swLever'),
+  ardPwr:$('ardPwr'),ardTx:$('ardTx'),espLed:$('espLed'),btLed:$('btLed'),rl0:$('rl0'),relayBody:$('relayBody'),ctrlTxt:$('ctrlTxt'),
+  stPwr:$('stPwr'),stWifi:$('stWifi'),stBt:$('stBt'),fwTxt:$('fwTxt'),wDht:$('w-dht'),wSoil:$('w-soil'),spDht:$('sparkDht'),spSoil:$('sparkSoil')};
+const FLOWS={
+  pv:{e:$('fl-pv'),spd:()=>S.solarW*4,dir:()=>1},
+  bat:{e:$('fl-bat'),spd:()=>Math.abs(S.netW)*8,dir:()=>S.netW>=0?1:-1},
+  v5:{e:$('fl-v5'),spd:()=>S.lvd?0:20,dir:()=>1},
+  led:{e:$('fl-led'),spd:()=>S.lvd?0:S.led*.5,dir:()=>1},
+  fan:{e:$('fl-fan'),spd:()=>(S.fan&&!S.lvd)?25:0,dir:()=>1},
+  pump:{e:$('fl-pump'),spd:()=>pumpVisual()?30:0,dir:()=>1}
+};
+Object.values(FLOWS).forEach(f=>f.off=0);
+function pumpVisual(){return !S.lvd&&(S.pump||(performance.now()-lastPulseAt<1400));}
+
+/* Visual state (eased toward the simulation state for smooth 60 fps) */
+function snapV(){Object.assign(V,{T:S.T,soil:S.soil,res:S.res,soc:socNow(),led:S.lvd?0:S.led,stress:plantStress()});}
+const V={T:S.T,soil:S.soil,res:S.res,soc:socNow(),led:S.led,fan:S.fan?1:0,fanA:0,stress:0,cloud:0,rain:0,cond:0,airOff:0,tubeOff:0};
+
+function renderModel(now,dt){
+  const tf=S.abs+(S.running?clamp(S.acc,0,.999):0);
+  const t=((tf%1440)+1440)%1440;
+  const w=S.weather, sf=sun(t);
+  const grey={despejado:0,parcial:.22,nublado:.55,lluvia:.72}[w];
+  // Sky & ground
+  const day=clamp(sf*2.4,0,1);
+  const dd=Math.min(Math.abs(t-390),Math.abs(t-1050));
+  const dawn=dd<70?1-dd/70:0;
+  let top=mix('#0B1626','#4E9CCB',day);top=mix(top,'#5B646C',grey*Math.max(day,.25));
+  let bot=mix('#1C2C3B','#CFE6F0',day);bot=mix(bot,'#F0A35E',dawn*.85);bot=mix(bot,'#98A2A9',grey*day);
+  M.sky0.setAttribute('stop-color',top);M.sky1.setAttribute('stop-color',bot);
+  M.gr0.setAttribute('stop-color',mix('#1F2A1B','#6F8F4E',Math.max(day,.15)));M.gr1.setAttribute('stop-color',mix('#141C12','#4C6236',Math.max(day,.15)));
+  M.stars.setAttribute('opacity',((1-day)*(1-grey*.85)).toFixed(2));
+  if(t>=360&&t<1080){const x=(t-360)/720;M.sun.setAttribute('transform',`translate(${(450-400*Math.cos(Math.PI*x)).toFixed(1)},${(470-370*Math.sin(Math.PI*x)).toFixed(1)})`);M.sun.setAttribute('opacity',(1-grey*.8).toFixed(2));}
+  else M.sun.setAttribute('opacity',0);
+  if(t>=1080||t<360){const x=(t>=1080?t-1080:t+360)/720;M.moon.setAttribute('transform',`translate(${(450-400*Math.cos(Math.PI*x)).toFixed(1)},${(470-360*Math.sin(Math.PI*x)).toFixed(1)})`);M.moon.setAttribute('opacity',(.95-grey*.7).toFixed(2));}
+  else M.moon.setAttribute('opacity',0);
+  // Clouds
+  V.cloud=ease(V.cloud,{despejado:0,parcial:.6,nublado:.95,lluvia:1}[w],1.5,dt);
+  M.cloudsG.setAttribute('opacity',V.cloud.toFixed(2));
+  M.cloudsG.setAttribute('fill',mix(mix('#FFFFFF','#9AA3AA',w==='nublado'?.6:0),'#5F686F',w==='lluvia'?1:0));
+  clouds.forEach((c,i)=>{const x=RM?c.x0:(((now/1000)*(5+i*3)+c.x0)%1150)-150;c.g.setAttribute('transform',`translate(${x.toFixed(1)},${c.y})`);});
+  // Rain
+  V.rain=ease(V.rain,w==='lluvia'?1:0,2,dt);
+  M.rain.setAttribute('opacity',V.rain.toFixed(2));
+  if(V.rain>.01&&!RM){rainDrops.forEach(d=>{const y=((d.y+now*.5*d.sp)%540)-40;const x=d.x-((y+40)*.15);d.e.setAttribute('x1',x.toFixed(1));d.e.setAttribute('y1',y.toFixed(1));d.e.setAttribute('x2',(x-3).toFixed(1));d.e.setAttribute('y2',(y+13).toFixed(1));});}
+  // Panel shine
+  const sh=clamp(S.solarW/17,0,1);
+  M.shine.setAttribute('opacity',(sh*(RM?.45:(.35+.2*Math.sin(now/550)))).toFixed(2));
+  // Enclosure temperature tint + heat shimmer
+  V.T=ease(V.T,S.T,3,dt);
+  const tt=clamp((V.T-18)/12,0,1);
+  M.tint.setAttribute('fill',mix('#3D8FD1','#F07A2C',tt));
+  M.tint.setAttribute('opacity',(.05+.17*Math.abs(tt-.45)/.55).toFixed(3));
+  const shm=clamp((V.T-28)/2,0,1);
+  M.shimmer.setAttribute('opacity',(shm*(RM?.8:(.55+.45*Math.sin(now/180)))).toFixed(2));
+  M.shimmer.setAttribute('transform',`translate(0,${RM?0:-((now/45)%10).toFixed(1)})`);
+  // LED
+  V.led=ease(V.led,S.lvd?0:S.led,4,dt);
+  M.cone.setAttribute('opacity',(V.led/100*.8).toFixed(3));
+  const dc=mix('#3A3F44','#FFF3B0',V.led/100);ledD.forEach(r=>r.setAttribute('fill',dc));
+  // Fan
+  const fanOn=S.fan&&!S.lvd;
+  V.fan=ease(V.fan,fanOn?1:0,fanOn?1.8:.9,dt);
+  if(!RM){V.fanA=(V.fanA+V.fan*900*dt)%360;M.blades.setAttribute('transform',`rotate(${V.fanA.toFixed(1)} 520 230)`);}
+  M.fanRing.setAttribute('stroke',fanOn?'#4FB3E8':'#3A4247');
+  M.fanAir.setAttribute('opacity',(RM?(fanOn?1:0):V.fan).toFixed(2));
+  if(!RM){V.airOff-=V.fan*40*dt;M.fanAir.setAttribute('stroke-dashoffset',V.airOff.toFixed(1));}
+  // Soil + plant
+  V.soil=ease(V.soil,S.soil,2,dt);
+  M.soilTop.setAttribute('fill',mix('#CDAE7E','#3A2416',clamp((V.soil-22)/50,0,1)));
+  M.cracks.setAttribute('opacity',clamp((34-V.soil)/8,0,1).toFixed(2));
+  V.stress=ease(V.stress,plantStress(),.8,dt);
+  const lc=mix('#2F7D3B','#C9AE3C',V.stress),droop=V.stress*42;
+  leaves.forEach(l=>{l.g.setAttribute('transform',`translate(${l.x.toFixed(1)},${l.y}) scale(${l.dir},1) rotate(${(-22+droop).toFixed(1)})`);l.g.firstChild.setAttribute('fill',lc);});
+  // Condensation
+  V.cond=ease(V.cond,clamp((S.RH-85)/6,0,1),1.5,dt);
+  M.cond.setAttribute('opacity',V.cond.toFixed(2));
+  // Irrigation
+  const pv=pumpVisual();
+  const ph=(now/1000)%1.2;
+  const pulseOn=pv&&(RM||ph<.55);
+  M.tubeFlow.setAttribute('opacity',pulseOn?1:0);
+  if(!RM&&pulseOn){V.tubeOff-=60*dt;M.tubeFlow.setAttribute('stroke-dashoffset',V.tubeOff.toFixed(1));}
+  drops.forEach((d,i)=>{
+    if(!pv){d.setAttribute('opacity',0);return;}
+    const k=RM?.3:(((now/1000)+i*.21)%.8)/.8;
+    d.setAttribute('cy',(dropPts[i][1]+k*12).toFixed(1));d.setAttribute('opacity',(1-k).toFixed(2));
+  });
+  M.pumpBody.setAttribute('stroke',S.dry?'#F04438':pv?'#4FA3F7':'#555555');
+  M.pumpBody.setAttribute('fill',S.dry?'#5A1E1A':'#2E3438');
+  // Reservoir
+  V.res=ease(V.res,S.res,5,dt);
+  const h=146*V.res/2000;M.water.setAttribute('y',(498-h).toFixed(1));M.water.setAttribute('height',h.toFixed(1));
+  M.overflow.setAttribute('opacity',(S.res>=1995&&w==='lluvia')?1:0);
+  if(!RM)M.overflow.setAttribute('stroke-dashoffset',(-(now/30)%10).toFixed(1));
+  // Battery
+  V.soc=ease(V.soc,socNow(),6,dt);
+  M.battFill.setAttribute('width',(80*clamp(V.soc,0,100)/100).toFixed(1));
+  M.battFill.setAttribute('fill',V.soc<20?'#D64535':V.soc<35?'#D99A2B':'#2E9A5A');
+  M.battTxt.textContent=Math.round(V.soc)+' %';
+  M.battWarn.setAttribute('display',S.faults.batt?'inline':'none');
+  M.ctrlTxt.textContent=(S.lvd?'LVD':S.float?'FLOAT':S.netW>.05?'CHG':'DSG')+' '+f1(battV());
+  // Display
+  const lines=oledLines();M.disp.forEach((ts,i)=>ts.textContent=lines[i]);
+  M.dispTxt.style.fill=S.lvd?'#0E1B1F':'#8BE6F2';
+  // Switch lever
+  M.swLever.setAttribute('transform',`rotate(${S.mode==='AUTO'?-35:35} 525 694)`);
+  // Status LEDs
+  const off=S.lvd;
+  M.ardPwr.setAttribute('fill',off?'#222':'#5CF07A');
+  M.ardTx.setAttribute('fill',!off&&(now%900<110)?'#FFD15A':'#3A3A2A');
+  M.espLed.setAttribute('fill',off?'#112':(S.otaBusy?(now%250<125):(now%2000<160))?'#4FA3F7':'#123');
+  M.btLed.setAttribute('fill',off?'#300':(now%1600<800)?'#FF4F4F':'#300');
+  M.stPwr.setAttribute('fill',off?'#3A1B1B':'#5CF07A');M.stWifi.setAttribute('fill',off?'#1B2430':'#4FA3F7');M.stBt.setAttribute('fill',off?'#1B2430':'#4F7BF7');
+  M.fwTxt.textContent=`FW ${S.fw} · D7 relé · D5/D6 PWM`;
+  M.rl0.setAttribute('fill',(S.pump&&!off)?'#FF5A4F':'#3A1B1B');
+  const rp=S.faults.relay?(.5+.5*Math.sin(now/160)):0;
+  M.relayBody.setAttribute('stroke',S.faults.relay?mix('#7A1E1A','#FF4F4F',rp):'#2F5D96');
+  M.relayBody.setAttribute('stroke-width',S.faults.relay?4:2);
+  // Sensor wire faults
+  [[M.wDht,M.spDht,S.faults.dht],[M.wSoil,M.spSoil,S.faults.soil]].forEach(([wire,sp,f])=>{
+    wire.style.stroke=f?'#F04438':'';wire.style.strokeDasharray=f?'14 8':'';
+    sp.setAttribute('display',f?'inline':'none');sp.setAttribute('opacity',f?(RM?1:(now%500<300?1:.25)):0);
+  });
+  // Energy flows
+  for(const k in FLOWS){const f=FLOWS[k],sp=f.spd();f.e.style.opacity=sp>.05?1:0;if(!RM&&sp>.05){f.off-=sp*f.dir()*dt;f.e.setAttribute('stroke-dashoffset',f.off.toFixed(1));}}
+}
+
+/* =====================================================================
+   Dashboard rendering
+   ===================================================================== */
+function spark(id,key,min,max,color,refs){
+  const cv=$(id),dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;
+  if(!w)return;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+  const css=getComputedStyle(document.documentElement);
+  const line=css.getPropertyValue('--line').trim(),muted=css.getPropertyValue('--muted').trim(),col=css.getPropertyValue(color).trim();
+  const padL=24,padT=4,padB=4,W=w-padL-4,H=h-padT-padB;
+  const X=a=>padL+(a-(S.abs-1440))/1440*W, Y=v=>padT+(1-(clamp(v,min,max)-min)/(max-min))*H;
+  g.strokeStyle=line;g.lineWidth=1;
+  for(let i=0;i<=2;i++){const y=padT+H*i/2;g.beginPath();g.moveTo(padL,y);g.lineTo(w-4,y);g.stroke();}
+  g.fillStyle=muted;g.font='10px "IBM Plex Mono",monospace';g.textBaseline='middle';
+  g.fillText(String(max),0,padT+4);g.fillText(String(min),0,padT+H-4);
+  (refs||[]).forEach(r=>{g.setLineDash([3,3]);g.strokeStyle=muted;g.beginPath();g.moveTo(padL,Y(r));g.lineTo(w-4,Y(r));g.stroke();g.setLineDash([]);});
+  const d=S.hist.filter(p=>p.abs>=S.abs-1440);if(d.length<2)return;
+  g.beginPath();d.forEach((p,i)=>{const x=X(p.abs),y=Y(p[key]);i?g.lineTo(x,y):g.moveTo(x,y);});
+  g.strokeStyle=col;g.lineWidth=1.8;g.stroke();
+  g.lineTo(X(d[d.length-1].abs),padT+H);g.lineTo(X(d[0].abs),padT+H);g.closePath();
+  g.globalAlpha=.14;g.fillStyle=col;g.fill();g.globalAlpha=1;
+  const e=d[d.length-1];g.beginPath();g.arc(X(e.abs),Y(e[key]),3,0,Math.PI*2);g.fillStyle=col;g.fill();
+}
+function setPill(e,cls,txt){e.className='pill '+cls;e.textContent=txt;}
+function setState(e,on,txt,bad){e.className='state '+(bad?'bad':on?'on':'off');e.textContent=txt;}
+let lastLogV=-1,lastAiV=-1;
+function render(){
+  const t=S.abs%1440,c=cap(),s=socNow(),day=t>=360&&t<1080;
+  $('clk').textContent=fmt(t);
+  $('dayn').textContent='Día '+(Math.floor(S.abs/1440)+1);
+  if(t>=360&&t<420)setPill($('phase'),'sun','Amanecer');
+  else if(t>=1020&&t<1080)setPill($('phase'),'sun','Atardecer');
+  else setPill($('phase'),day?'sun':'mute',day?'Día':'Noche');
+  $('play').textContent=S.running?'Pausar':'Reanudar';
+  document.querySelectorAll('#speed button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.s===S.speed));
+
+  // Display
+  const o=$('oled'),ot=$('oledtxt');
+  if(S.lvd){o.classList.add('off');ot.textContent='                \n                \n                \n ';}
+  else{o.classList.remove('off');ot.textContent=oledLines().join('\n');}
+  $('fw').textContent='FW '+S.fw;
+  document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.mode));
+  document.querySelectorAll('#ai button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.a==='1')===S.ai));
+
+  // Energy
+  $('soc').textContent=Math.round(s)+' %';
+  const sb=$('socbar');sb.style.width=s+'%';sb.style.background=s<20?'var(--crit)':s<35?'var(--warn)':'var(--ok)';
+  $('vbat').textContent=`${f1(battV())} V · ${f1(S.battWh)} / ${c} Wh`;
+  if(S.lvd)setPill($('chg'),'crit','LVD: cargas cortadas');
+  else if(S.float)setPill($('chg'),'ok','Flotación');
+  else if(S.netW>0.05)setPill($('chg'),'ok','Cargando');
+  else setPill($('chg'),s<20?'warn':'mute','Descargando');
+  $('pv').innerHTML=f1(S.solarW)+'<small> W</small>';
+  $('pvd').textContent=day?WX[S.weather].n:'Sin sol';
+  $('load').innerHTML=f1(S.loadW)+'<small> W</small>';
+  $('loadd').textContent=S.lvd?'Cargas apagadas':`LED ${f1(10*S.led/100)} W · 5 V ${f1(Math.max(0,S.loadW-10*S.led/100-(S.pump?.72:0)))} W`;
+  $('net').innerHTML=(S.netW>=0?'+':'−')+f1(Math.abs(S.netW))+'<small> W</small>';
+  $('net').style.color=S.netW>=0?'var(--ok)':'var(--warn)';
+  if(S.netW<-.05)$('netd').textContent='Hasta LVD: '+fmtH(Math.max(0,(S.battWh-.08*c)/-S.netW));
+  else $('netd').textContent=S.float?'Batería llena':'A la batería';
+
+  // Environment
+  $('amb').textContent='Exterior '+f1(ambient(t))+' °C';
+  const tg=S.th.tTarget;
+  if(S.tRead==null){$('tv').textContent='ERR';setPill($('tp'),'crit','Sin lectura');}
+  else{$('tv').innerHTML=f1(S.tRead)+'<small> °C</small>';const ts=tempStatus();setPill($('tp'),ts[0],ts[1]);}
+  $('td').textContent='Objetivo '+f1(tg)+' °C';
+  if(S.rhRead==null){$('hv').textContent='ERR';setPill($('hp'),'crit','Sin lectura');}
+  else{
+    $('hv').innerHTML=Math.round(S.rhRead)+'<small> %</small>';
+    if(S.rhRead>S.th.rhMax)setPill($('hp'),'warn','Alta');else if(S.rhRead<45)setPill($('hp'),'warn','Baja');else setPill($('hp'),'ok','OK');
+  }
+  if(S.soilRead==null){$('sv').textContent='ERR';setPill($('sp'),'crit',S.lvd?'Sin energía':'Sensor');}
+  else{
+    $('sv').innerHTML=Math.round(S.soilRead)+'<small> %</small>';
+    if(S.soilRead<S.th.soilLow)setPill($('sp'),'warn','Seco');else if(S.soilRead>S.th.soilHigh+8)setPill($('sp'),'info','Saturado');else setPill($('sp'),'ok','Óptimo');
+  }
+  $('sd').textContent=S.adc==null?'ADC —':`A0 = ${S.adc}`;
+
+  // Actuators
+  const manual=S.mode==='MANUAL'&&!S.lvd;
+  $('actnote').textContent=S.lvd?'Sin energía':manual?'Control manual activo':'Controlados por el lazo AUTO';
+  setState($('ledst'),S.led>0,S.led>0?`ON · ${S.led} %`:'OFF');
+  $('ledbar').style.width=S.led+'%';
+  $('ledd').textContent=`${f1(10*S.led/100)} W · PWM D5 = ${Math.round(S.led*2.55)}/255`+(S.mode==='AUTO'&&S.ledReason?` · ${S.ai?'IA':'Regla'}: ${S.ledReason}`:'')+(S.mode==='AUTO'&&!day?' · fuera de fotoperiodo':'');
+  $('ledsl').disabled=!manual;if(document.activeElement!==$('ledsl'))$('ledsl').value=S.man.led;$('ledslv').textContent=S.man.led+' %';
+  setState($('pumpst'),S.pump||S.pumpCmd,S.dry?'EN SECO':S.pump?'ON · pulsos':S.pumpCmd?'CICLO · pausa':'OFF',S.dry||(S.faults.relay&&S.pump));
+  $('pumpd').textContent=(S.faults.relay?'Relé pegado · ':'')+'Relé D7 (activo en bajo) · 3 s ON / 12 s OFF · 25 mL por pulso'+(S.queue>0?` · cola: ${S.queue} pulsos`:'');
+  $('pumpsw').disabled=!manual;$('pumpsw').setAttribute('aria-checked',S.man.pump);
+  setState($('fanst'),S.fan,S.fan?'ON':'OFF');
+  $('fand').textContent='MOSFET D6 · 5 V / 0,2 A'+(S.tRead==null&&S.mode==='AUTO'&&!S.lvd?' · forzado ON (a prueba de fallos)':'');
+  $('fansw').disabled=!manual;$('fansw').setAttribute('aria-checked',S.man.fan);
+  $('shot').disabled=S.lvd||S.res<50;
+
+  // Reservoir
+  const r=S.res;
+  $('resv').textContent=Math.round(r)+' mL';
+  $('tank').style.height=(r/20)+'%';
+  $('resd').textContent=`de 2000 mL · ≈ ${Math.floor(r/25)} pulsos restantes`;
+  $('resd2').textContent=`Riego últimas 24 h: ${usedWater()} mL · nivel estimado por conteo de pulsos`;
+  if(r<50)setPill($('resp'),'crit','Vacío');else if(r<300)setPill($('resp'),'warn','Bajo');else if(S.weather==='lluvia'&&r<2000)setPill($('resp'),'info','Recargando');else setPill($('resp'),'ok','OK');
+  document.querySelectorAll('#wx button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.w===S.weather));
+  $('heat').setAttribute('aria-checked',S.heat);
+
+  // Trends
+  spark('c-t','T',10,40,'--accent',[tg]);
+  spark('c-s','soil',20,80,'--water',[S.th.soilLow,S.th.soilHigh]);
+  spark('c-b','soc',0,100,'--ok',[]);
+  spark('c-p','pv',0,20,'--sun',[]);
+  $('k-t').textContent=f1(S.T)+' °C';$('k-s').textContent=Math.round(S.soil)+' %';
+  $('k-b').textContent=Math.round(s)+' %';$('k-p').textContent=f1(S.solarW)+' W';
+
+  // Alarms
+  const AL=[];
+  if(S.lvd)AL.push(['crit','Batería agotada: cargas desconectadas']);
+  else if(s<20)AL.push(['warn','Batería baja']);
+  if(S.dry)AL.push(['crit','Bomba en seco']);
+  if(r<50)AL.push(['crit','Reservorio vacío']);else if(r<300)AL.push(['warn','Reservorio bajo']);
+  if(S.faults.dht)AL.push(['crit','DHT22 sin respuesta']);
+  if(S.faults.soil)AL.push(['crit','Sensor de suelo inválido']);
+  if(S.faults.relay)AL.push(['crit','Relé de bomba pegado']);
+  if(S.faults.batt)AL.push(['warn','Batería degradada']);
+  if(S.tRead!=null&&S.tRead>tg+4)AL.push(['warn','Estrés térmico']);
+  if(S.mode==='MANUAL')AL.push(['info','Modo MANUAL']);
+  if(!S.ai)AL.push(['mute','IA apagada']);
+  if(S.otaBusy)AL.push(['info',`OTA ${Math.round(S.otaP)} %`]);
+  const html=(AL.length?AL:[['ok','Sistema nominal · sin alarmas']]).map(a=>`<span class="pill ${a[0]}">${a[1]}</span>`).join('');
+  if($('alarms').innerHTML!==html)$('alarms').innerHTML=html;
+
+  // Serial monitor
+  if(lastLogV!==S.logV){
+    lastLogV=S.logV;
+    const e=$('serial');e.innerHTML='';
+    S.log.forEach(x=>{const d=document.createElement('div');const ts=document.createElement('span');ts.className='t';ts.textContent=`[${stamp(x.abs)}] `;const m=document.createElement('span');m.className=x.l;m.textContent=x.msg;d.append(ts,m);e.append(d);});
+  }
+  if(lastAiV!==S.aiV){
+    lastAiV=S.aiV;
+    const e=$('ailog');e.innerHTML='';
+    if(!S.ailog.length)e.innerHTML='<p class="d">Sin análisis todavía.</p>';
+    S.ailog.forEach(x=>{
+      const a=document.createElement('article');a.className='ai';
+      a.innerHTML=`<header><span class="mono">${stamp(x.abs)}</span><span class="pill ${x.manual?'info':'mute'}">${x.manual?'Bajo demanda':'Ciclo horario'}</span></header>`;
+      const ul=document.createElement('ul');
+      x.lines.forEach(([l,txt])=>{const li=document.createElement('li');li.className=l;li.textContent=txt;ul.append(li);});
+      a.append(ul);e.append(a);
+    });
+  }
+  $('airun').disabled=!S.ai||S.lvd;
+  $('airun').textContent=S.ai?'Ejecutar análisis ahora':'IA apagada';
+
+  // Faults / OTA
+  ['dht','soil','relay','batt'].forEach(k=>$('f-'+k).setAttribute('aria-checked',S.faults[k]));
+  $('otat').textContent=S.fw==='1.5.0'?'Firmware 1.5.0 · al día':'Firmware 1.4.1 · disponible 1.5.0';
+  $('otabar').style.width=(S.fw==='1.5.0'?100:S.otaP)+'%';
+  $('wifi').textContent=S.lvd?'ESP8266 sin energía':S.otaBusy?`Descargando e instalando… ${Math.round(S.otaP)} %`:`Wi-Fi conectado · RSSI ${-56-Math.round(Math.random()*4)} dBm`;
+  $('ota').disabled=S.otaBusy||S.fw==='1.5.0'||S.lvd;
+
+  updateInfo();
+}
+
+/* =====================================================================
+   Info panel (component popover)
+   ===================================================================== */
+let sel=null,infoRefs=[];
+function openInfo(id){
+  const c=COMP[id];if(!c)return;
+  sel=id;
+  scene.querySelectorAll('.comp.sel').forEach(g=>g.classList.remove('sel'));
+  (comps[id]||[]).forEach(g=>g.classList.add('sel'));
+  $('infoIc').textContent=c.ic;$('infoN').textContent=c.n;$('infoPin').textContent='Pin: '+c.pin;
+  $('infoFn').textContent=c.fn;$('infoSpec').textContent='Especificaciones: '+c.spec;
+  $('infoCost').textContent=c.usd!=null?`Costo aprox.: US$ ${money(c.usd)} · L ${money(c.usd*RATE)}`+(c.note?` (${c.note})`:''):`Costo: ${c.note||'—'}`;
+  const box=$('infoActs');box.innerHTML='';infoRefs=[];
+  (c.act||[]).forEach(a=>{
+    if(a.t==='btn'){
+      const b=document.createElement('button');b.className='btn ghost sm';b.onclick=()=>{a.f();dirty=true;};box.append(b);
+      infoRefs.push(()=>{b.textContent=a.l();b.disabled=!!(a.d&&a.d());});
+    }else if(a.t==='sw'){
+      const row=document.createElement('div');row.className='rowa';
+      const b=document.createElement('button');b.className='sw'+(a.danger?' danger':'');b.setAttribute('role','switch');b.setAttribute('aria-label',a.l);b.onclick=()=>{a.f();dirty=true;};
+      const s=document.createElement('span');s.className='d';s.textContent=a.l;row.append(b,s);box.append(row);
+      infoRefs.push(()=>{b.setAttribute('aria-checked',a.c());b.disabled=!!(a.d&&a.d());});
+    }else if(a.t==='range'){
+      const row=document.createElement('div');row.className='rowa';
+      const lb=document.createElement('span');lb.className='d';lb.textContent=a.l;
+      const r=document.createElement('input');r.type='range';r.min=0;r.max=100;r.step=5;r.setAttribute('aria-label',a.l);r.style.flex='1';r.style.minWidth='120px';
+      const v=document.createElement('span');v.className='mono d';
+      r.oninput=()=>{a.f(+r.value);dirty=true;};r.onchange=()=>log(`MANUAL: LED fijado en ${S.man.led} %`,'i');
+      row.append(lb,r,v);box.append(row);
+      infoRefs.push(()=>{r.disabled=!!(a.d&&a.d());if(document.activeElement!==r)r.value=a.v();v.textContent=a.v()+' %';});
+    }else if(a.t==='wx'){
+      const seg=document.createElement('div');seg.className='seg wide';seg.setAttribute('role','group');seg.setAttribute('aria-label','Clima');
+      const bs=Object.keys(WX).map(k=>{const b=document.createElement('button');b.textContent={despejado:'Despejado',parcial:'Parcial',nublado:'Nublado',lluvia:'Lluvia'}[k];b.onclick=()=>{setWeather(k);dirty=true;};seg.append(b);return [k,b];});
+      const row=document.createElement('div');row.className='rowa';
+      const hb=document.createElement('button');hb.className='sw danger';hb.setAttribute('role','switch');hb.setAttribute('aria-label','Ola de calor');hb.onclick=()=>{toggleHeat();dirty=true;};
+      const hs=document.createElement('span');hs.className='d';hs.textContent='Ola de calor (+6 °C)';row.append(hb,hs);
+      box.append(seg,row);
+      infoRefs.push(()=>{bs.forEach(([k,b])=>b.setAttribute('aria-pressed',S.weather===k));hb.setAttribute('aria-checked',S.heat);});
+    }
+  });
+  if(!(c.act||[]).length){const p=document.createElement('span');p.className='d';p.textContent='Sin acciones directas: componente de solo lectura.';box.append(p);}
+  $('info').hidden=false;
+  const g0=(comps[id]||[])[0],pane=document.querySelector('.modelpane');
+  if(g0&&pane){const r=g0.getBoundingClientRect(),pr=pane.getBoundingClientRect();$('info').classList.toggle('top',(r.top+r.bottom)/2>pr.top+pr.height*.55);}
+  flashCard(c.card);
+  updateInfo();
+}
+function updateInfo(){
+  if(!sel||$('info').hidden)return;
+  const c=COMP[sel];
+  const st=c.st();setPill($('infoSt'),st[0],st[1]);
+  const dl=$('infoLive');const rows=c.live();
+  if(dl.children.length!==rows.length*2){dl.innerHTML='';rows.forEach(()=>{dl.append(document.createElement('dt'),document.createElement('dd'));});}
+  rows.forEach(([k,v],i)=>{dl.children[i*2].textContent=k;dl.children[i*2+1].textContent=v;});
+  infoRefs.forEach(f=>f());
+}
+function closeInfo(){$('info').hidden=true;sel=null;scene.querySelectorAll('.comp.sel').forEach(g=>g.classList.remove('sel'));}
+function flashCard(id){
+  const card=$(id);if(!card)return;
+  if(window.innerWidth>=900)card.scrollIntoView({behavior:RM?'auto':'smooth',block:'nearest'});
+  card.classList.add('flash');clearTimeout(card._ft);card._ft=setTimeout(()=>card.classList.remove('flash'),1800);
+}
+$('infoX').onclick=closeInfo;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('info').hidden)closeInfo();});
+Object.entries(comps).forEach(([id,gs])=>gs.forEach(g=>{
+  g.addEventListener('click',e=>{e.stopPropagation();openInfo(id);});
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openInfo(id);}});
+}));
+// Dashboard card hover → highlight linked components in the model
+const byCard={};Object.entries(COMP).forEach(([id,c])=>{(byCard[c.card]=byCard[c.card]||[]).push(id);});
+Object.entries(byCard).forEach(([cid,ids])=>{
+  const card=$(cid);if(!card)return;
+  card.addEventListener('mouseenter',()=>ids.forEach(id=>(comps[id]||[]).forEach(g=>g.classList.add('lnk'))));
+  card.addEventListener('mouseleave',()=>ids.forEach(id=>(comps[id]||[]).forEach(g=>g.classList.remove('lnk'))));
+});
+
+/* =====================================================================
+   Dashboard controls
+   ===================================================================== */
+$('play').onclick=()=>{S.running=!S.running;dirty=true;};
+document.querySelectorAll('#speed button').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.s;dirty=true;});
+$('p15').onclick=()=>adv(15);
+$('p60').onclick=()=>adv(60);
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+document.querySelectorAll('#ai button').forEach(b=>b.onclick=()=>setAI(b.dataset.a==='1'));
+$('ledsl').oninput=e=>setManLed(+e.target.value);
+$('ledsl').onchange=()=>log(`MANUAL: LED fijado en ${S.man.led} %`,'i');
+$('pumpsw').onclick=toggleManPump;
+$('fansw').onclick=toggleManFan;
+$('shot').onclick=shot;
+document.querySelectorAll('#wx button').forEach(b=>b.onclick=()=>setWeather(b.dataset.w));
+$('heat').onclick=toggleHeat;
+$('airun').onclick=()=>{if(!S.ai||S.lvd)return;runAI(true);};
+['dht','soil','relay','batt'].forEach(k=>$('f-'+k).onclick=()=>toggleFault(k));
+$('ota').onclick=ota;
+document.querySelectorAll('#scen button').forEach(b=>b.onclick=()=>runScenario(b.dataset.sc));
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!=='tab-'+b.dataset.tab);
+});
+// Labels toggle
+let showLbl=LS.get('cafe01.labels')!=='0';
+function applyLbl(){$('labels').classList.toggle('off',!showLbl);$('lblsw').setAttribute('aria-checked',showLbl);}
+$('lblsw').onclick=()=>{showLbl=!showLbl;LS.set('cafe01.labels',showLbl?'1':'0');applyLbl();};
+// Theme toggle
+const THEMES=['auto','light','dark'];let theme=LS.get('cafe01.theme');if(!THEMES.includes(theme))theme='auto';
+function applyTheme(){if(theme==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=theme;$('theme').textContent='Tema: '+{auto:'auto',light:'claro',dark:'oscuro'}[theme];dirty=true;}
+$('theme').onclick=()=>{theme=THEMES[(THEMES.indexOf(theme)+1)%3];LS.set('cafe01.theme',theme);applyTheme();};
+// Thresholds ("EEPROM" = localStorage)
+const thIds={'th-t':'tTarget','th-sl':'soilLow','th-sh':'soilHigh','th-rh':'rhMax'};
+function syncTh(){Object.entries(thIds).forEach(([id,k])=>{if(document.activeElement!==$(id))$(id).value=S.th[k];});}
+Object.entries(thIds).forEach(([id,k])=>$(id).onchange=e=>{
+  const v=parseFloat(e.target.value),inp=e.target;
+  const next={...S.th,[k]:v};
+  let err='';
+  if(isNaN(v)||v<+inp.min||v>+inp.max)err=`Valor fuera de rango (${inp.min}–${inp.max}).`;
+  else if(next.soilHigh<next.soilLow+5)err='El corte de riego debe quedar al menos 5 puntos por encima del inicio.';
+  if(err){$('thmsg').textContent=err;$('thmsg').style.color='var(--crit)';syncTh();return;}
+  S.th=next;LS.set('cafe01.th',JSON.stringify(S.th));
+  $('thmsg').style.color='';$('thmsg').textContent='Guardado en EEPROM. El ventilador se enciende a objetivo + 1,0 °C y se apaga a objetivo + 0,5 °C.';
+  log(`App: umbral actualizado · ${{tTarget:'objetivo T',soilLow:'inicio de riego',soilHigh:'corte de riego',rhMax:'HR máx.'}[k]} = ${String(v).replace('.',',')}${k==='tTarget'?' °C':' %'} (EEPROM)`,'a');
+});
+function setHH(){document.documentElement.style.setProperty('--hh',$('top').offsetHeight+'px');}
+window.addEventListener('resize',()=>{setHH();dirty=true;});
+
+/* =====================================================================
+   Boot + main loop
+   ===================================================================== */
+function boot(){
+  log('[BOOT] Arduino: setup() OK · umbrales cargados desde EEPROM','o');
+  log('ESP8266: conectado al Wi-Fi (RSSI −58 dBm) · app enlazada','o');
+  log('DHT22 (D2) OK · sensor de suelo (A0) calibrado: seco 620 / saturado 280','o');
+  log(`Relé de bomba (D7, activo en bajo) en reposo · ventilador ${S.T>S.th.tTarget+1?'ON':'OFF'} (T ${f1(S.T)} °C, objetivo ${f1(S.th.tTarget)} °C)`,'i');
+  S.hist.push({abs:S.abs,T:S.T,soil:S.soil,soc:socNow(),pv:S.solarW});
+  if(S.T<=S.th.tTarget+1&&S.RH<=S.th.rhMax)S.fan=false;
+  runAI(false);
+}
+loadTh();boot();snapV();syncTh();applyLbl();applyTheme();setHH();render();
+let last=performance.now(),lastDash=0;
+function frame(now){
+  const dt=Math.min(.1,Math.max(0,(now-last)/1000));last=now;
+  if(S.running){
+    S.acc+=S.speed*dt;
+    let n=0;while(S.acc>=1&&n<240){step();S.acc--;n++;}
+    if(n>=240)S.acc=0;
+  }
+  renderModel(now,dt);
+  if(dirty&&now-lastDash>120){render();lastDash=now;dirty=false;}
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.CAFE01={get state(){return S;},step,runScenario,openInfo,render}; // debugging hook
+})();
+</script>
+</body>
+</html>
